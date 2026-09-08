@@ -1,6 +1,6 @@
-import styles from "./Desktop.module.css";
-import { MenuBar } from "./MenuBar";
-import { Desktop } from "./Desktop";
+import styles from "./Finder.module.css";
+import { MenuBar } from "./menubar/MenuBar";
+import { Desktop } from "./desktop/Desktop";
 
 /** The System 7.5 OS shell: menu bar over the desktop surface. */
 export function Finder() {

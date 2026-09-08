@@ -1,4 +1,4 @@
-import { Finder } from "./desktop/Finder";
+import { Finder } from "./finder/Finder";
 
 export default function App() {
   return <Finder />;

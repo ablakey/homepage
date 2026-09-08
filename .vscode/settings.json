@@ -1,0 +1,7 @@
+{
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "chat.tools.terminal.autoApprove": {
+    "npx tsc": true
+  }
+}
