@@ -4,10 +4,10 @@ title: About
 
 # About
 
-Andrew has worked as a software engineer in the industrial and warehouse mobile robotics industry since 2013. He independently designed and developed real-time monitoring software that currently manages a fleet of _over ten thousand robots operating worldwide._
+I have been working as a software engineer in the industrial/warehouse mobile robotics industry since 2013. I've independently designed and developed real-time monitoring software that currently manages a fleet of _over ten thousand robots operating worldwide._
 
-Today he leads a team of software engineers building mobile robot mapping, fleet configuration, and monitoring applications for web, dashboard, and mobile use in large warehouse spaces.
+Today I lead a team of software engineers in developing mobile robot mapping, fleet configuration, and monitoring applications for Web, dashboard, and mobile uses in large warehouse spaces.
 
-![photo of Andrew](about.jpg)
+![photo of me](about.jpg)
 
-Most of his time is spent being a dad to two boys, which usually means getting into plenty of mischief. When he isn't doing that, he's likely at the piano, working on home renovations, or writing software for fun. He holds a BES and an MSc in Geography from the University of Waterloo.
+Most of my time is enjoyed being a dad of two boys, which usually means getting into lots of mischief. When I'm not doing any of that, I'm likely on the piano, working on home rennovations, or writing software for fun. I completed both a BES and MSc in Geography at the University of Waterloo.

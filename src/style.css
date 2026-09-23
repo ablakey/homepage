@@ -31,6 +31,7 @@ header {
 
 .site-name {
   font-weight: 600;
+  font-size: x-large;
   text-decoration: none;
   margin-right: 1rem;
 }
@@ -56,6 +57,10 @@ h1 {
 
 h2 {
   font-size: 1.15rem;
+}
+
+img {
+  border-radius: 8px;
 }
 
 .posts {
