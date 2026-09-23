@@ -1,11 +1,8 @@
 ---
+date: 2023-12-12
 title: The Microwave
 starred: true
 ---
-
-# The Microwave
-
-<time datetime="2023-12-12">2023-12-12</time>
 
 The world's most advanced free digital microwave!
 

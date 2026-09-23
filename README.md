@@ -37,5 +37,5 @@ layout. Folder structure maps to routes.
 
 ### pointless.click URLs to repair
 
-- https://physics.pointless.click ([src/posts/2024/brownian/index.md](src/posts/2024/brownian/index.md))
+
 - https://rubik.pointless.click ([src/posts/2024/rubik/index.md](src/posts/2024/rubik/index.md))

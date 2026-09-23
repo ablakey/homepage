@@ -1,11 +1,8 @@
 ---
+date: 2022-12-10
 title: Minibot
 starred: true
 ---
-
-# Minibot
-
-<time datetime="2022-12-10">2022-12-10</time>
 
 I'm building a Pololu Romi + Raspberry Pi that will do... I'm not quite sure what, yet.
 

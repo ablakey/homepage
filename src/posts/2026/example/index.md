@@ -1,9 +1,7 @@
 ---
 title: An example post
+date: 2026-01-15
+eleventyExcludeFromCollections: true
 ---
-
-# An example post
-
-<time datetime="2026-01-15">2026-01-15</time>
 
 Write your post content here.

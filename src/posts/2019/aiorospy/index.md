@@ -1,10 +1,7 @@
 ---
+date: 2019-04-01
 title: Aiorospy
 ---
-
-# Aiorospy
-
-<time datetime="2019-04-01">2019-04-01</time>
 
 An `asyncio` wrapper for `rospy`. This allows us to use the async concurrency model with Rospy instead of threading.
 

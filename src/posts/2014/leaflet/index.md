@@ -1,10 +1,7 @@
 ---
+date: 2014-10-01
 title: "Leaflet: Simple Graticule"
 ---
-
-# Leaflet: Simple Graticule
-
-<time datetime="2014-10-01">2014-10-01</time>
 
 A graticule, but for unprojected Cartesian spaces.
 

@@ -1,10 +1,7 @@
 ---
+date: 2024-03-09
 title: Rubik
 ---
-
-# Rubik
-
-<time datetime="2024-03-09">2024-03-09</time>
 
 I wrote a simple game based on a board game my kids love. This was mostly an experiment on using emojis as graphics assets.
 
