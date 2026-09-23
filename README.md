@@ -37,9 +37,6 @@ layout. Folder structure maps to routes.
 
 ### pointless.click URLs to repair
 
-- https://cancel.pointless.click/ ([src/posts/2021/cancel/index.md](src/posts/2021/cancel/index.md))
-- https://arcade.pointless.click/ ([src/posts/2023/arcade/index.md](src/posts/2023/arcade/index.md))
-- https://microwave.pointless.click ([src/posts/2023/microwave/index.md](src/posts/2023/microwave/index.md))
 - https://physics.pointless.click ([src/posts/2024/brownian/index.md](src/posts/2024/brownian/index.md))
 - https://googly.pointless.click ([src/posts/2024/googly/index.md](src/posts/2024/googly/index.md))
 - https://rubik.pointless.click ([src/posts/2024/rubik/index.md](src/posts/2024/rubik/index.md))
