@@ -4,28 +4,36 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "validate": "prettier --check . && eslint . && tsc",
+    "start": "eleventy --serve",
+    "build": "eleventy",
+    "validate": "eleventy && prettier --check . && stylelint \"src/**/*.css\" --allow-empty-input && html-validate \"_site/**/*.html\"",
     "format": "prettier --write ."
   },
-  "dependencies": {
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
-  },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
-    "@vitejs/plugin-react": "^6.1.1",
-    "eslint": "^10.10.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "oxc-transform-react": "^0.145.0",
+    "@11ty/eleventy": "^3.1.6",
+    "html-validate": "^10.1.1",
     "prettier": "^3.9.6",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.69.0",
-    "vite": "^8.2.2"
+    "prettier-plugin-jinja-template": "^2.2.0",
+    "stylelint": "^16.25.0",
+    "stylelint-config-standard": "^39.0.1"
+  },
+  "stylelint": {
+    "extends": "stylelint-config-standard",
+    "rules": {
+      "no-descending-specificity": null
+    }
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-jinja-template"
+    ],
+    "overrides": [
+      {
+        "files": "*.njk",
+        "options": {
+          "parser": "jinja-template"
+        }
+      }
+    ]
   }
 }

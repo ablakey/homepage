@@ -1,0 +1,95 @@
+:root {
+  --max-width: 40rem;
+  --fg: #222;
+  --muted: #666;
+  --accent: #b58900;
+  --bg: #fdfdfd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  max-width: var(--max-width);
+  margin: 3rem auto;
+  padding: 0 1rem;
+  font:
+    16px/1.6 system-ui,
+    sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+a {
+  color: inherit;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+
+.site-name {
+  font-weight: 600;
+  text-decoration: none;
+  margin-right: 1rem;
+}
+
+header nav {
+  display: inline;
+}
+
+header nav a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: var(--muted);
+}
+
+header nav a:hover {
+  color: var(--fg);
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.15rem;
+}
+
+.posts {
+  list-style: none;
+  padding: 0;
+}
+
+.posts li {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+}
+
+.posts time {
+  flex: none;
+  width: 6rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.posts a {
+  text-decoration: none;
+}
+
+.posts a:hover {
+  text-decoration: underline;
+}
+
+.star {
+  color: var(--accent);
+}
+
+footer {
+  margin-top: 3rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}

@@ -1,17 +1,30 @@
 # Homepage
 
-## Facts
+A minimal site built with [Eleventy](https://www.11ty.dev/). Pages are written
+in Markdown; the HTML boilerplate and shared header/nav/footer live in one
+layout. Folder structure maps to routes.
 
-Menu bar:
+- `npm start` — live viewer at http://localhost:8080 with hot reload
+- `npm run build` — generate the static site into `_site/`
+- `npm run validate` — build, then check formatting (Prettier), lint CSS
+  (stylelint) and HTML (html-validate)
+- `npm run format` — format everything with Prettier
 
-- 20px tall. 19px + 1px black line.
-- The mac icon (right) is practically 15px tall. I bet the icons are typically 16x16
+## Authoring
 
-## TODOs
+- Layout and page chrome live in [src/\_includes/base.njk](src/_includes/base.njk).
+- Each page is a Markdown file with a `title` in front matter:
 
-- I need to ensure all licensing is handled properly and I properly attribute things I use.
+  ```md
+  ---
+  title: My page
+  ---
 
-## Attributions
+  # My page
 
-Font comes from:
-https://github.com/KingDuane/Chicago-Kare
+  Content here.
+  ```
+
+- Add a post at `src/posts/<year>/<slug>/index.md`, then add a matching
+  `<li>` to the posts list in [src/index.md](src/index.md). Star a favourite
+  with `<span class="star" role="img" aria-label="Favourite">★</span>`.

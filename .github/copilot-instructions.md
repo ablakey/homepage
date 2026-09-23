@@ -1,6 +1,6 @@
 # Copilot Instructions
 
-## CSS Modules
+## CSS
 
-- Do not create new `.module.css` files unless explicitly asked.
-- If not specified, add styles to the closest existing `.module.css` file.
+- Do not create new `.css` files unless explicitly asked.
+- If not specified, add styles to the closest existing `.css` file.
