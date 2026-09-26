@@ -12,14 +12,14 @@ title: Résumé
 
 ## Experience
 
-### Locus Robotics — 2018–Present
+### Locus Robotics, Boston, MA — 2018–Present
 
 Design, develop, and manage fleet configuration and real-time monitoring systems for tens of thousands of mobile robots worldwide.
 
 - **Principal Software Engineer**, Tools Team Lead (2023–Present)
 - **Staff Software Engineer**, Tools Team Lead (2018–2023)
 
-### Clearpath Robotics — 2013–2018
+### Clearpath Robotics, Kitchener, Ontario — 2013–2018
 
 Built systems and processes for hydrographic robotic data collection, robotic fleet management, and monitoring.
 
@@ -33,12 +33,21 @@ Built systems and processes for hydrographic robotic data collection, robotic fl
 - **BES, Geography** — University of Waterloo (2005–2010)
   - _Diploma of Excellence in Geographical Information Systems_
 
-## Awards and Publications
+## Publications, Patents, Awards
 
-- ESRI Young Scholar for Canada (2013)
+- [Stand-alone self-driving material-transport vehicle](https://patents.google.com/patent/US12298146B2) (Patent, 2025)
+
+- [System, apparatus and method for automatic environmental data collection and analysis](https://patents.google.com/patent/US11799806B2) (Patent, 2023)
+
+- [Systems and methods for WiFi mapping in an industrial facility](https://patents.google.com/patent/US11343758B2) (Patent, 2022)
+
+- [Method, system and apparatus for handling operational constraints for control of unmanned vehicles](https://patents.google.com/patent/US10241515B2) (Patent, 2019)
 
 - [A Field Comparison of Methods and Data Results Between A Manual and Robotic Remote Sensed Survey of A Storm Water Management Pond in Kitchener, Ontario](https://www.sciencedirect.com/science/article/pii/S1195103624006815) (2014, Geomatica)
+
 - [SunSpot: A Spatial Decision Support Web-Application for Exploring Urban Solar Energy Potential ](https://uwspace.uwaterloo.ca/items/3e4fe725-3dee-48c4-9bc4-3e90cccb80b5) (2013, Master's Thesis)
+
+- ESRI Young Scholar for Canada (2013)
 
 ## Contact
 
