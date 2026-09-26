@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: npm ci
-      - run: npm run build
+      - run: npm run build -- --pathprefix=/${{ github.event.repository.name }}/
       - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
