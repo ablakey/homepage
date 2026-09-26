@@ -2,7 +2,7 @@
   --max-width: 40rem;
   --fg: #222;
   --muted: #666;
-  --accent: #b58900;
+  --accent: #4a7c59;
   --bg: #fdfdfd;
 }
 
@@ -23,6 +23,11 @@ body {
 
 a {
   color: inherit;
+  text-decoration-color: var(--accent);
+}
+
+a:hover {
+  color: var(--accent);
 }
 
 header {
@@ -57,6 +62,15 @@ h1 {
 
 h2 {
   font-size: 1.15rem;
+  margin-top: 2rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #ddd;
+}
+
+h3 {
+  font-size: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 img {
@@ -87,6 +101,12 @@ img {
 
 .posts a:hover {
   text-decoration: underline;
+}
+
+.post-date {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 .star {
