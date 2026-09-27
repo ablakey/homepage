@@ -101,6 +101,10 @@ img {
   border-radius: 8px;
 }
 
+pre {
+  overflow-x: auto;
+}
+
 .posts {
   list-style: none;
   padding: 0;
