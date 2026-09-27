@@ -1,6 +1,8 @@
 ---
-title: Home
+title: Posts
 ---
+
+# Posts
 
 <ul class="posts">
   {%- for post in collections.posts %}

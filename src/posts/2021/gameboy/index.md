@@ -4,7 +4,7 @@ title: Game Boy Emulator
 starred: true
 ---
 
-In an attempt to get familliar with Rust, I wrote a Game Boy emulator.
+In an attempt to get familiar with Rust, I wrote a Game Boy emulator.
 
 [Source code](https://github.com/ablakey/gameboy)
 

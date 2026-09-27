@@ -30,9 +30,9 @@ Once assembled, the Romi Control Board has:
 
 ### Assembly
 
-While assembly can be fairly intuitive, the [Pololu Romi Chassis User's Guide](https://www.pololu.com/docs/0J68) is a great resource for verifying any assumptions being made. Be careful about where the instructions describe a differing options depending on what hardware you're mounting. In this case, we're mounting the **Romi 32U4 Control Board**, which changes some steps:
+While assembly can be fairly intuitive, the [Pololu Romi Chassis User's Guide](https://www.pololu.com/docs/0J68) is a great resource for verifying any assumptions being made. Be careful about where the instructions describe differing options depending on what hardware you're mounting. In this case, we're mounting the **Romi 32U4 Control Board**, which changes some steps:
 
-1. you **do not** need to jumper the two sets of AA batteries, the control board has slots for both and handles the serialization of voltage for you
+1. You **do not** need to jumper the two sets of AA batteries; the control board has slots for both and handles the serialization of voltage for you
 2. The Raspberry Pi (Model 3 B) will mount directly to this board via the GPIO cluster of pins
 
 ### Soldering
@@ -43,10 +43,10 @@ As you solder each section, use a multimeter to verify you haven't shorted any o
 
 There are 5 groups of things to solder:
 
-1. The 6-pin socket connector strips for the wheel encoder/power supplies (
+1. The 6-pin socket connector strips for the wheel encoder/power supplies
    - note there are two sets of holes, you want the one closest to the wheels
 2. The L-shaped 6-pin male jumpers into the encoders
-   - be sure you dry-fit these first, there's many ways do orient them wrongly
+   - be sure you dry-fit these first, there are many ways to orient them wrongly
    - the black frame must be flush with the encoder board
 3. The power pins between the motors and the encoder board
    - be especially careful not to apply too much heat for too long as this can warp the brushes in the motor
@@ -62,7 +62,7 @@ There are 5 groups of things to solder:
 
 ![Motors](bot-02.jpg)
 
-> **Note:** You might think the pins and stand-off for the motor encoder/power source are not plumb with the board. You're correct. This is part my lack of a steady hand, and part because it seems to just work out this way. I saw a few images of people mounting the pins outwards in the other set of holes, but I opted to go with the examples shown in all of the Pololu tutorials and photos.
+> **Note:** You might think the pins and stand-off for the motor encoder/power source are not plumb with the board. You're correct. This is partly my lack of a steady hand, and partly because it seems to just work out this way. I saw a few images of people mounting the pins outwards in the other set of holes, but I opted to go with the examples shown in all of the Pololu tutorials and photos.
 
 ## Software
 
@@ -74,7 +74,7 @@ Software is broken up into two categories: everything that runs on the Raspberry
 
 The [Raspberry Pi Imager](https://www.raspberrypi.com/software/) makes this completely painless. It will:
 
-- Download the desired OS (Raspberry Pi OS Lite 64-bit)
+- Download the desired OS (Raspberry Pi OS Lite 32-bit)
 - Format and properly partition an SD Card then install the above OS
 - Allow you to set things such as the Wifi credentials, the local hostname for the device, and an ssh password.
 
@@ -97,7 +97,7 @@ If you set the hostname and Wifi credentials correctly, you can address it on th
 
 `ping pihostname.local` (where you replace `pihostname` with the hostname you picked)
 
-> **Note:** `ping` is a command that sends a tiny packet of data over the network that requests a tiny responds. It's a way to way "hello!" and prove that your two computers can communicate.
+> **Note:** `ping` is a command that sends a tiny packet of data over the network that requests a tiny response. It's a way to say "hello!" and prove that your two computers can communicate.
 
 Once that works, you can `ssh` to the robot using:
 
@@ -107,7 +107,7 @@ It will ask a few security-related questions which you can say `yes` to. It will
 
 #### Installing OpenCV
 
-You now need to set up a few things to get the Camera working and OpenCV Installed.
+You now need to set up a few things to get the Camera working and OpenCV installed.
 
 ```bash
 sudo raspi-config                # Go to "Interface Options" and enable "Legacy Camera". You'll have to reboot after.

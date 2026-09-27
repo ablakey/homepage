@@ -4,13 +4,7 @@ title: Résumé
 
 # Résumé
 
-## Skills
-
-- End-to-end systems design and management
-- REST and real-time API design (robot configuration, telemetry)
-- TypeScript, Python, Rust, ROS, PostgreSQL, Django
-
-## Experience
+## Work History
 
 ### Locus Robotics, Boston, MA — 2018–Present
 
@@ -35,17 +29,17 @@ Built systems and processes for hydrographic robotic data collection, robotic fl
 
 ## Publications, Patents, Awards
 
-- [Stand-alone self-driving material-transport vehicle](https://patents.google.com/patent/US12298146B2) (Patent, 2025)
+- Stand-alone self-driving material-transport vehicle ([Patent, 2025](https://patents.google.com/patent/US12298146B2))
 
-- [System, apparatus and method for automatic environmental data collection and analysis](https://patents.google.com/patent/US11799806B2) (Patent, 2023)
+- System, apparatus and method for automatic environmental data collection and analysis ([Patent, 2023](https://patents.google.com/patent/US11799806B2))
 
-- [Systems and methods for WiFi mapping in an industrial facility](https://patents.google.com/patent/US11343758B2) (Patent, 2022)
+- Systems and methods for WiFi mapping in an industrial facility ([Patent, 2022](https://patents.google.com/patent/US11343758B2))
 
-- [Method, system and apparatus for handling operational constraints for control of unmanned vehicles](https://patents.google.com/patent/US10241515B2) (Patent, 2019)
+- Method, system and apparatus for handling operational constraints for control of unmanned vehicles ([Patent, 2019](https://patents.google.com/patent/US10241515B2))
 
-- [A Field Comparison of Methods and Data Results Between A Manual and Robotic Remote Sensed Survey of A Storm Water Management Pond in Kitchener, Ontario](https://www.sciencedirect.com/science/article/pii/S1195103624006815) (2014, Geomatica)
+- A Field Comparison of Methods and Data Results Between A Manual and Robotic Remote Sensed Survey of A Storm Water Management Pond in Kitchener, Ontario ([Geomatica, 2014](https://doi.org/10.5623/cig2014-408))
 
-- [SunSpot: A Spatial Decision Support Web-Application for Exploring Urban Solar Energy Potential ](https://uwspace.uwaterloo.ca/items/3e4fe725-3dee-48c4-9bc4-3e90cccb80b5) (2013, Master's Thesis)
+- SunSpot: A Spatial Decision Support Web-Application for Exploring Urban Solar Energy Potential ([Master's Thesis, 2013](https://uwspace.uwaterloo.ca/items/3e4fe725-3dee-48c4-9bc4-3e90cccb80b5))
 
 - ESRI Young Scholar for Canada (2013)
 

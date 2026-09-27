@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ title }}</title>
-    <link rel="icon" href="/favicon.ico" />
+    <title>Blakey{% if title %}- {{ title }}{% endif %}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <header>
-      <a class="site-name" href="/">Blakey's Page</a>
+      <span class="site-name">Blakey's Page</span>
       <nav>
-        <a href="/">Home</a>
+        <a href="/">Posts</a>
         <a href="/about/">About</a>
         <a href="/resume/">Résumé</a>
       </nav>

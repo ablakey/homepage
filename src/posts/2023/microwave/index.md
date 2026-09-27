@@ -10,7 +10,7 @@ I wrote this because today's microwaves are usually quite expensive, take up a l
 
 Please be careful when you microwave Pop Tarts. The preset is usually the safest way to go.
 
-https://ablakey.github.io/microwave/
+<https://ablakey.github.io/microwave/>
 
 [Source code](https://github.com/ablakey/microwave)
 

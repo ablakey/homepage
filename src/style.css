@@ -1,9 +1,24 @@
 :root {
+  color-scheme: light dark;
+
   --max-width: 40rem;
   --fg: #222;
   --muted: #666;
-  --accent: #4a7c59;
-  --bg: #fdfdfd;
+  --accent: #00a336;
+  --accent-2: #008228;
+  --bg: #f4f4f2;
+  --border: #ddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #b8b8b8;
+    --muted: #999;
+    --accent: #2ee063;
+    --accent-2: #00a748;
+    --bg: #1a1b1e;
+    --border: #333;
+  }
 }
 
 * {
@@ -15,7 +30,7 @@ body {
   margin: 3rem auto;
   padding: 0 1rem;
   font:
-    16px/1.6 system-ui,
+    14px/1.6 system-ui,
     sans-serif;
   color: var(--fg);
   background: var(--bg);
@@ -23,22 +38,27 @@ body {
 
 a {
   color: inherit;
-  text-decoration-color: var(--accent);
 }
 
 a:hover {
   color: var(--accent);
 }
 
+li::marker {
+  color: var(--accent-2);
+}
+
 header {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
 }
 
 .site-name {
   font-weight: 600;
-  font-size: x-large;
-  text-decoration: none;
+  font-size: 1.35rem;
   margin-right: 1rem;
+  color: var(--accent-2);
 }
 
 header nav {
@@ -52,19 +72,19 @@ header nav a {
 }
 
 header nav a:hover {
-  color: var(--fg);
+  text-decoration: underline;
 }
 
 h1 {
   margin: 0 0 0.25rem;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
 }
 
 h2 {
   font-size: 1.15rem;
   margin-top: 2rem;
   padding-bottom: 0.25rem;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border);
 }
 
 h3 {
@@ -74,6 +94,10 @@ h3 {
 }
 
 img {
+  display: block;
+  margin-inline: auto;
+  max-width: 100%;
+  height: auto;
   border-radius: 8px;
 }
 
