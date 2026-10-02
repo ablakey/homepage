@@ -1,5 +1,9 @@
+import EleventyVitePlugin from "@11ty/eleventy-plugin-vite";
+
 export default function (eleventyConfig) {
+  eleventyConfig.addPlugin(EleventyVitePlugin);
   eleventyConfig.addPassthroughCopy("src/style.css");
+  eleventyConfig.addPassthroughCopy("src/scripts");
   eleventyConfig.addPassthroughCopy("src/**/*.{jpg,png,gif,svg}");
   eleventyConfig.addGlobalData("layout", "base.njk");
   eleventyConfig.addCollection("posts", (api) =>

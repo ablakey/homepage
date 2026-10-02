@@ -6,16 +6,19 @@
   "scripts": {
     "start": "eleventy --serve",
     "build": "eleventy",
-    "validate": "eleventy && prettier --check . && stylelint \"src/**/*.css\" --allow-empty-input && html-validate \"_site/**/*.html\"",
+    "typecheck": "tsc",
+    "validate": "tsc && eleventy && prettier --check . && stylelint \"src/**/*.css\" --allow-empty-input && html-validate \"_site/**/*.html\"",
     "format": "prettier --write ."
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.6",
+    "@11ty/eleventy-plugin-vite": "^8.0.0",
     "html-validate": "^10.1.1",
     "prettier": "^3.9.6",
     "prettier-plugin-jinja-template": "^2.2.0",
     "stylelint": "^16.25.0",
-    "stylelint-config-standard": "^39.0.1"
+    "stylelint-config-standard": "^39.0.1",
+    "typescript": "^7.0.2"
   },
   "stylelint": {
     "extends": "stylelint-config-standard",
@@ -35,5 +38,8 @@
         }
       }
     ]
+  },
+  "dependencies": {
+    "pixi.js": "^8.22.0"
   }
 }
