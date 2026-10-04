@@ -48,37 +48,9 @@ export function rayAabb(
   return near <= far && far >= 0 ? { near, far } : null;
 }
 
-export class CollisionWorld {
-  bounds: Rect;
-  rects: readonly Rect[];
-
-  constructor(
-    bounds: Rect = { x: 0, y: 0, width: 0, height: 0 },
-    rects: readonly Rect[] = [],
-  ) {
-    this.bounds = bounds;
-    this.rects = rects;
-  }
-
-  // Brute force over all rects; fine for a few thousand boxes at 100 rays/s.
-  castRay(origin: Vec2, angle: number): RayHit {
-    const dir = { x: Math.cos(angle), y: Math.sin(angle) };
-    let distance = Math.max(0, rayAabb(origin, dir, this.bounds)?.far ?? 0);
-    let hitRect: Rect | null = null;
-
-    for (const rect of this.rects) {
-      const span = rayAabb(origin, dir, rect);
-      // Ignore rects the origin is inside of (near < 0).
-      if (span && span.near >= 0 && span.near < distance) {
-        distance = span.near;
-        hitRect = rect;
-      }
-    }
-
-    return {
-      point: { x: origin.x + dir.x * distance, y: origin.y + dir.y * distance },
-      distance,
-      rect: hitRect,
-    };
-  }
+// Euclidean distance from a point to the nearest point of a rect (0 if inside).
+export function distanceToRect(p: Vec2, rect: Rect): number {
+  const dx = Math.max(rect.x - p.x, 0, p.x - (rect.x + rect.width));
+  const dy = Math.max(rect.y - p.y, 0, p.y - (rect.y + rect.height));
+  return Math.hypot(dx, dy);
 }

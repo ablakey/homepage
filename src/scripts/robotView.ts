@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
 import type { Pose } from "./collision";
+import { ROBOT_SIZE as SIZE } from "./robot";
 
-const SIZE = 16;
 const COLOR = 0x00a336;
 
 // Square body with a line from centre to the front edge marking the heading.

@@ -1,9 +1,19 @@
-import type { CollisionWorld, Pose, RayHit } from "./collision";
+import type { Pose, Vec2 } from "./collision";
+import type { Obstacles } from "./obstacles";
+
+export interface LidarReading {
+  origin: Vec2;
+  // The (noisy) hit point, or the max-range end point when nothing was hit.
+  point: Vec2;
+  hit: boolean;
+}
 
 export interface LidarOptions {
   fov: number;
   scanRateHz: number;
   raysPerScan: number;
+  // Rays that travel further than this (px) without hitting anything return no point.
+  maxRange: number;
   // Standard deviation (px) of Gaussian noise applied to each hit's range.
   rangeNoise: number;
 }
@@ -11,7 +21,8 @@ export interface LidarOptions {
 const DEFAULT_OPTIONS: LidarOptions = {
   fov: (120 * Math.PI) / 180,
   scanRateHz: 30,
-  raysPerScan: 256,
+  raysPerScan: 64,
+  maxRange: 200,
   rangeNoise: 1.5,
 };
 
@@ -32,38 +43,39 @@ export class Lidar {
     this.options = { ...DEFAULT_OPTIONS, ...options };
   }
 
-  update(deltaMs: number, pose: Pose, world: CollisionWorld): RayHit[] {
+  update(deltaMs: number, pose: Pose, world: Obstacles): LidarReading[] {
     const periodMs = 1000 / this.options.scanRateHz;
     this.pendingMs += deltaMs;
-    const hits: RayHit[] = [];
+    const readings: LidarReading[] = [];
     while (this.pendingMs >= periodMs) {
       this.pendingMs -= periodMs;
-      hits.push(...this.scan(pose, world));
+      readings.push(...this.scan(pose, world));
     }
-    return hits;
+    return readings;
   }
 
-  private scan(pose: Pose, world: CollisionWorld): RayHit[] {
-    const { fov, raysPerScan } = this.options;
+  private scan(pose: Pose, world: Obstacles): LidarReading[] {
+    const { fov, raysPerScan, maxRange } = this.options;
     const step = raysPerScan > 1 ? fov / (raysPerScan - 1) : 0;
     const start = pose.heading - (step * (raysPerScan - 1)) / 2;
-    const hits: RayHit[] = [];
+    const origin = { ...pose.position };
+    const readings: LidarReading[] = [];
     for (let i = 0; i < raysPerScan; i++) {
       const angle = start + i * step;
-      hits.push(this.withNoise(world.castRay(pose.position, angle), angle));
+      const { distance } = world.castRay(origin, angle);
+      const hit = distance <= maxRange;
+      const range = hit
+        ? distance + gaussian() * this.options.rangeNoise
+        : maxRange;
+      readings.push({
+        origin,
+        point: {
+          x: origin.x + Math.cos(angle) * range,
+          y: origin.y + Math.sin(angle) * range,
+        },
+        hit,
+      });
     }
-    return hits;
-  }
-
-  private withNoise(hit: RayHit, angle: number): RayHit {
-    const error = gaussian() * this.options.rangeNoise;
-    return {
-      ...hit,
-      distance: hit.distance + error,
-      point: {
-        x: hit.point.x + Math.cos(angle) * error,
-        y: hit.point.y + Math.sin(angle) * error,
-      },
-    };
+    return readings;
   }
 }

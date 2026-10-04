@@ -1,8 +1,8 @@
 import { Particle, ParticleContainer, Texture } from "pixi.js";
-import type { RayHit } from "./collision";
+import type { Vec2 } from "./collision";
 
 const HIT_COLOR = 0xef4444;
-const HIT_SIZE = 3;
+const HIT_SIZE = 1;
 
 // Renders lidar hits as points that fade out over `lifetimeMs`.
 export class LidarView {
@@ -13,11 +13,11 @@ export class LidarView {
   // Parallel to container.particleChildren, oldest first.
   private readonly ages: number[] = [];
 
-  constructor(lifetimeMs = 3000) {
+  constructor(lifetimeMs = 1000) {
     this.lifetimeMs = lifetimeMs;
   }
 
-  addHits(hits: RayHit[]): void {
+  addHits(hits: readonly { point: Vec2 }[]): void {
     const scale = HIT_SIZE / Texture.WHITE.width;
     for (const { point } of hits) {
       this.container.addParticle(

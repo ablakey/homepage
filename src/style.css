@@ -7,6 +7,7 @@
   --accent: #00a336;
   --accent-2: #008228;
   --bg: #f4f4f2;
+  --slam: #fff;
   --border: #ddd;
 }
 
@@ -17,6 +18,7 @@
     --accent: #2ee063;
     --accent-2: #00a748;
     --bg: #1a1b1e;
+    --slam: #3b3c43;
     --border: #333;
   }
 }
@@ -33,7 +35,11 @@ html {
 #overlay {
   position: absolute;
   inset: 0;
-  z-index: 1000;
+  max-width: var(--max-width);
+  margin: 0 auto;
+
+  /* Behind content; the body background propagates to the viewport, so it still paints underneath. */
+  z-index: -1;
   overflow: hidden;
   pointer-events: none;
 }
@@ -135,7 +141,9 @@ pre {
 
 .posts time {
   flex: none;
-  width: 6rem;
+
+  /* Wide enough to leave a gap the overlay robot can drive through. */
+  width: 7rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
