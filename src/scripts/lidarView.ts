@@ -1,8 +1,8 @@
 import { Particle, ParticleContainer, Texture } from "pixi.js";
 import type { Vec2 } from "./collision";
 
-const HIT_COLOR = 0xef4444;
-const HIT_SIZE = 1;
+const HIT_COLOR = 0x5b8fc7;
+const HIT_SIZE = 2;
 
 // Renders lidar hits as points that fade out over `lifetimeMs`.
 export class LidarView {

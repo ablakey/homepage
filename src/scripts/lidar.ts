@@ -21,8 +21,8 @@ export interface LidarOptions {
 const DEFAULT_OPTIONS: LidarOptions = {
   fov: (120 * Math.PI) / 180,
   scanRateHz: 30,
-  raysPerScan: 64,
-  maxRange: 200,
+  raysPerScan: 32,
+  maxRange: 250,
   rangeNoise: 1.5,
 };
 
@@ -34,7 +34,7 @@ function gaussian(): number {
   );
 }
 
-// Each scan fires `raysPerScan` evenly spaced rays across `fov`, centred on the pose heading.
+// Each scan splits `fov` (centred on the heading) into `raysPerScan` equal slots and fires one ray at a random angle within each.
 export class Lidar {
   readonly options: LidarOptions;
   private pendingMs = 0;
@@ -56,12 +56,12 @@ export class Lidar {
 
   private scan(pose: Pose, world: Obstacles): LidarReading[] {
     const { fov, raysPerScan, maxRange } = this.options;
-    const step = raysPerScan > 1 ? fov / (raysPerScan - 1) : 0;
-    const start = pose.heading - (step * (raysPerScan - 1)) / 2;
+    const step = fov / raysPerScan;
+    const start = pose.heading - fov / 2;
     const origin = { ...pose.position };
     const readings: LidarReading[] = [];
     for (let i = 0; i < raysPerScan; i++) {
-      const angle = start + i * step;
+      const angle = start + (i + Math.random()) * step;
       const { distance } = world.castRay(origin, angle);
       const hit = distance <= maxRange;
       const range = hit

@@ -1,16 +1,18 @@
-import type { Rect } from "./collision";
+import type { Rect, Vec2 } from "./collision";
 import type { LidarReading } from "./lidar";
 
 export const SLAM_MAX_VALUE = 100;
-const INITIAL_VALUE = 50;
+export const SLAM_MIN_VALUE = -100;
+// Cells at or beyond this much evidence either way count as mapped (free if positive, occupied if negative).
+export const SLAM_KNOWN_VALUE = 25;
 
-// Per-cell free-space evidence: rays passing through a cell add 1, a ray ending on an obstacle in a cell subtracts 1.
+// Per-cell evidence (0 = unmapped): every cell a ray passes through gains 1; the cell a ray hits loses 1.
 export class SlamGrid {
   readonly cellSize: number;
   bounds: Rect = { x: 0, y: 0, width: 0, height: 0 };
   cols = 0;
   rows = 0;
-  values = new Uint8Array(0);
+  values = new Int8Array(0);
   // Bumped whenever `values` changes, so views can skip redundant redraws.
   version = 0;
 
@@ -18,7 +20,7 @@ export class SlamGrid {
     this.cellSize = cellSize;
   }
 
-  // Clears the map only when the bounds actually change.
+  // Keeps existing cells when only the size changes (e.g. the page grows); clears if the origin moves.
   setBounds(bounds: Rect): void {
     const b = this.bounds;
     if (
@@ -29,11 +31,59 @@ export class SlamGrid {
     ) {
       return;
     }
+    const sameOrigin = b.x === bounds.x && b.y === bounds.y;
+    const old = { values: this.values, cols: this.cols, rows: this.rows };
     this.bounds = { ...bounds };
     this.cols = Math.ceil(bounds.width / this.cellSize);
     this.rows = Math.ceil(bounds.height / this.cellSize);
-    this.values = new Uint8Array(this.cols * this.rows).fill(INITIAL_VALUE);
+    this.values = new Int8Array(this.cols * this.rows);
+    if (sameOrigin) {
+      const cols = Math.min(this.cols, old.cols);
+      for (let row = 0; row < Math.min(this.rows, old.rows); row++) {
+        const from = row * old.cols;
+        this.values.set(
+          old.values.subarray(from, from + cols),
+          row * this.cols,
+        );
+      }
+    }
     this.version++;
+  }
+
+  clear(): void {
+    this.values.fill(0);
+    this.version++;
+  }
+
+  isKnown(p: Vec2): boolean {
+    const cx = Math.floor((p.x - this.bounds.x) / this.cellSize);
+    const cy = Math.floor((p.y - this.bounds.y) / this.cellSize);
+    if (cx < 0 || cy < 0 || cx >= this.cols || cy >= this.rows) return false;
+    return this.values[cy * this.cols + cx] >= SLAM_KNOWN_VALUE;
+  }
+
+  // If `p` lies in a known-free cell bordering unmapped space, the centre of one such unmapped neighbour.
+  unmappedNeighbour(p: Vec2): Vec2 | null {
+    if (!this.isKnown(p)) return null;
+    const cx = Math.floor((p.x - this.bounds.x) / this.cellSize);
+    const cy = Math.floor((p.y - this.bounds.y) / this.cellSize);
+    for (const [dx, dy] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
+      const nx = cx + dx;
+      const ny = cy + dy;
+      if (nx < 0 || ny < 0 || nx >= this.cols || ny >= this.rows) continue;
+      if (Math.abs(this.values[ny * this.cols + nx]) < SLAM_KNOWN_VALUE) {
+        return {
+          x: this.bounds.x + (nx + 0.5) * this.cellSize,
+          y: this.bounds.y + (ny + 0.5) * this.cellSize,
+        };
+      }
+    }
+    return null;
   }
 
   // Amanatides-Woo traversal of every cell from the ray origin to its end point.
@@ -81,7 +131,10 @@ export class SlamGrid {
   private add(cx: number, cy: number, delta: number): void {
     if (cx < 0 || cy < 0 || cx >= this.cols || cy >= this.rows) return;
     const i = cy * this.cols + cx;
-    const value = Math.min(SLAM_MAX_VALUE, Math.max(0, this.values[i] + delta));
+    const value = Math.min(
+      SLAM_MAX_VALUE,
+      Math.max(SLAM_MIN_VALUE, this.values[i] + delta),
+    );
     if (value !== this.values[i]) {
       this.values[i] = value;
       this.version++;

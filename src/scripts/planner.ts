@@ -82,6 +82,14 @@ class OccupancyGrid {
     };
   }
 
+  blockUnknown(isKnown: (p: Vec2) => boolean, except: number): void {
+    for (let cell = 0; cell < this.blocked.length; cell++) {
+      if (cell !== except && !isKnown(this.centreOf(cell))) {
+        this.blocked[cell] = 1;
+      }
+    }
+  }
+
   // Breadth-first search outwards for the closest unblocked cell, or -1 if none.
   nearestFree(cell: number): number {
     const seen = new Uint8Array(this.blocked.length);
@@ -234,24 +242,87 @@ function shortcut(grid: OccupancyGrid, points: Vec2[]): Vec2[] {
 }
 
 const SMOOTH_ITERATIONS = 5;
+// Upper bound (px) on how far from each corner the first rounding pass starts its curve.
+const MAX_CORNER_CUT = 60;
+// How far (px) a corner may be pushed away from the obstacle it wraps, leaving room to round it.
+const CORNER_MARGIN = 12;
 
 const lerp = (a: Vec2, b: Vec2, t: number): Vec2 => ({
   x: a.x + (b.x - a.x) * t,
   y: a.y + (b.y - a.y) * t,
 });
 
-// Cut corner `b` with a chord, shrinking the cut until the chord is clear; keeps `b` if none fit.
-function cutCorner(grid: OccupancyGrid, a: Vec2, b: Vec2, c: Vec2): Vec2[] {
-  for (let t = 0.25; t > 0.02; t /= 2) {
-    const q = lerp(b, a, t);
-    const r = lerp(b, c, t);
+const dist = (a: Vec2, b: Vec2) => Math.hypot(b.x - a.x, b.y - a.y);
+
+// Cut corner `b` with a chord at fractions `ta`/`tc` along each side, halving the cut until the chord is clear; keeps `b` if none fit.
+function cutCorner(
+  grid: OccupancyGrid,
+  a: Vec2,
+  b: Vec2,
+  c: Vec2,
+  ta = 0.25,
+  tc = 0.25,
+): Vec2[] {
+  for (; Math.max(ta, tc) > 0.02; ta /= 2, tc /= 2) {
+    const q = lerp(b, a, ta);
+    const r = lerp(b, c, tc);
     if (grid.lineOfSight(q, r)) return [q, r];
   }
   return [b];
 }
 
+// Shortcut corners hug obstacles, leaving no room to round them; push each outward along its bisector where clear.
+function widenCorners(grid: OccupancyGrid, points: Vec2[]): Vec2[] {
+  const out = [points[0]];
+  for (let i = 1; i < points.length - 1; i++) {
+    const [a, b, c] = [out[i - 1], points[i], points[i + 1]];
+    const ab = dist(a, b);
+    const bc = dist(b, c);
+    const bx = (a.x - b.x) / ab + (c.x - b.x) / bc;
+    const by = (a.y - b.y) / ab + (c.y - b.y) / bc;
+    const len = Math.hypot(bx, by);
+    let corner = b;
+    if (ab > 0 && bc > 0 && len > 1e-6) {
+      for (let m = CORNER_MARGIN; m >= 1; m /= 2) {
+        const p = { x: b.x - (bx / len) * m, y: b.y - (by / len) * m };
+        if (
+          !grid.blocked[grid.cellAt(p)] &&
+          grid.lineOfSight(a, p) &&
+          grid.lineOfSight(p, c)
+        ) {
+          corner = p;
+          break;
+        }
+      }
+    }
+    out.push(corner);
+  }
+  out.push(points[points.length - 1]);
+  return out;
+}
+
+// Round each corner symmetrically, as wide as neighbouring corners and obstacles allow.
+function roundCorners(grid: OccupancyGrid, points: Vec2[]): Vec2[] {
+  const out = [points[0]];
+  for (let i = 1; i < points.length - 1; i++) {
+    const [a, b, c] = [points[i - 1], points[i], points[i + 1]];
+    const ab = dist(a, b);
+    const bc = dist(b, c);
+    const d = Math.min(ab / 2, bc / 2, MAX_CORNER_CUT);
+    const cut = d === 0 ? [b] : cutCorner(grid, a, b, c, d / ab, d / bc);
+    // Adjacent cuts can meet at a shared midpoint; a duplicate would survive Chaikin as a sharp kink.
+    for (const p of cut) {
+      if (dist(out[out.length - 1], p) > 1e-6) out.push(p);
+    }
+  }
+  out.push(points[points.length - 1]);
+  return out;
+}
+
 // Chaikin corner cutting (converges to a quadratic B-spline) that never enters blocked cells.
 function smooth(grid: OccupancyGrid, points: Vec2[]): Vec2[] {
+  if (points.length > 2)
+    points = roundCorners(grid, widenCorners(grid, points));
   for (let n = 0; n < SMOOTH_ITERATIONS && points.length > 2; n++) {
     const out = [points[0]];
     for (let i = 1; i < points.length - 1; i++) {
@@ -263,14 +334,58 @@ function smooth(grid: OccupancyGrid, points: Vec2[]): Vec2[] {
   return points;
 }
 
-// Waypoints (excluding `start`) keeping the robot centre at least `clearance` from every obstacle.
+// Nearest point (by path distance through mapped free space) satisfying `isTarget`, or null if none is reachable.
+export function findReachable(
+  obstacles: Obstacles,
+  isKnown: (p: Vec2) => boolean,
+  start: Vec2,
+  clearance: number,
+  isTarget: (p: Vec2) => boolean,
+): Vec2 | null {
+  const grid = new OccupancyGrid(obstacles, clearance);
+  const from = grid.cellAt(start);
+  grid.blockUnknown(isKnown, from);
+  const { cols, rows, blocked } = grid;
+  const seen = new Uint8Array(blocked.length);
+  const queue = [from];
+  seen[from] = 1;
+  for (let i = 0; i < queue.length; i++) {
+    const cur = queue[i];
+    const p = grid.centreOf(cur);
+    if (isTarget(p)) return p;
+    const cx = cur % cols;
+    const cy = Math.floor(cur / cols);
+    for (const [dx, dy] of MOVES.slice(0, 4)) {
+      const nx = cx + dx;
+      const ny = cy + dy;
+      if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+      const next = ny * cols + nx;
+      if (!seen[next] && !blocked[next]) {
+        seen[next] = 1;
+        queue.push(next);
+      }
+    }
+  }
+  return null;
+}
+
+export interface Plan {
+  // Waypoints (excluding the start), all within mapped space.
+  path: Vec2[];
+  // Set when the path stops short of the goal: the first unmapped point on the way, for the robot to face and scan.
+  lookAt: Vec2 | null;
+}
+
+// Keeps the robot centre at least `clearance` from every obstacle and inside cells where `isKnown` holds.
+// Routes optimistically through unmapped space, then drives only the mapped prefix; replan as the map grows.
 // If `goal` is blocked, plans to the nearest reachable free cell instead. Returns null if no path exists.
 export function planPath(
   obstacles: Obstacles,
+  isKnown: (p: Vec2) => boolean,
   start: Vec2,
   goal: Vec2,
   clearance: number,
-): Vec2[] | null {
+): Plan | null {
   const grid = new OccupancyGrid(obstacles, clearance);
   const from = grid.cellAt(start);
   const goalCell = grid.cellAt(goal);
@@ -280,8 +395,19 @@ export function planPath(
   const cells = aStar(grid, from, to);
   if (!cells) return null;
 
-  const points = cells.map((cell) => grid.centreOf(cell));
+  const unknownAt = cells.findIndex(
+    (cell, i) => i > 0 && !isKnown(grid.centreOf(cell)),
+  );
+  const points = (unknownAt < 0 ? cells : cells.slice(0, unknownAt)).map(
+    (cell) => grid.centreOf(cell),
+  );
   points[0] = { ...start };
-  if (to === goalCell) points.push({ ...goal });
-  return smooth(grid, shortcut(grid, points)).slice(1);
+  if (unknownAt < 0 && to === goalCell) points.push({ ...goal });
+
+  // Shortcuts and smoothing must not stray into unmapped cells either.
+  grid.blockUnknown(isKnown, from);
+  return {
+    path: smooth(grid, shortcut(grid, points)).slice(1),
+    lookAt: unknownAt < 0 ? null : grid.centreOf(cells[unknownAt]),
+  };
 }

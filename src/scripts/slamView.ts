@@ -49,6 +49,7 @@ export class SlamView {
       data[o] = r;
       data[o + 1] = g;
       data[o + 2] = b;
+      // Occupied (negative) cells clamp to fully transparent.
       data[o + 3] = (grid.values[i] / SLAM_MAX_VALUE) * 255;
     }
     this.canvas.getContext("2d")!.putImageData(image, 0, 0);
