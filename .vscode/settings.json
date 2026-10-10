@@ -6,6 +6,7 @@
   "editor.formatOnSave": true,
   "chat.tools.terminal.autoApprove": {
     "npx tsc": true,
-    "npx prettier": true
+    "npx prettier": true,
+    "npx eleventy": true
   }
 }

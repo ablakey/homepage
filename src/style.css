@@ -4,8 +4,8 @@
   --max-width: 40rem;
   --fg: #222;
   --muted: #666;
-  --accent: #00a336;
-  --accent-2: #008228;
+  --accent: #a8541c;
+  --accent-2: #8a4415;
   --bg: #f4f4f2;
   --slam: #fff;
   --border: #ddd;
@@ -15,8 +15,8 @@
   :root {
     --fg: #b8b8b8;
     --muted: #999;
-    --accent: #2ee063;
-    --accent-2: #00a748;
+    --accent: #e39a62;
+    --accent-2: #c47a45;
     --bg: #1a1b1e;
     --slam: #3b3c43;
     --border: #333;

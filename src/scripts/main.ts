@@ -310,7 +310,12 @@ app.ticker.add((ticker) => {
   }
   lidarView.addHits(readings.filter((r) => r.hit));
   lidarView.update(ticker.deltaMS);
-  slamView.update(slam);
+  slamView.update(slam, robot.pose.position, {
+    x: 0,
+    y: 0,
+    width: app.screen.width,
+    height: app.screen.height,
+  });
   // Hidden while inactive; the grid keeps its data for the next activation.
   const fade = ticker.deltaMS / SLAM_FADE_MS;
   const alpha = slamView.container.alpha;
