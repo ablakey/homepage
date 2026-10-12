@@ -1,39 +1,17 @@
 import { Particle, ParticleContainer, Texture } from "pixi.js";
-import type { Rect, Vec2 } from "./collision";
-import { SLAM_MAX_VALUE, type SlamGrid } from "./slam";
+import { cssColor, mixColor, onColorSchemeChange } from "../lib/color";
+import { config } from "./config";
+import { containsRect, type Rect, type Vec2 } from "../lib/geometry";
+import { hexesInRange } from "../lib/hex";
+import { clamp, smoothstep } from "../lib/math";
+import type { SlamGrid } from "../lib/slam";
 
-// Hex texture resolution per world pixel, so edges stay sharp on high-DPI screens and when zoomed.
-const TEXTURE_SCALE = 4;
-// Space (px) left between neighbouring hexes so the grid stays visible.
-const HEX_GAP = 1;
-// Hexes within this distance (px) of the robot are tinted towards the accent colour, fading out with distance.
-const GLOW_RADIUS = 70;
-// Tint mix at the robot's own hex.
-const GLOW_STRENGTH = 0.55;
-
-const parseCtx = document.createElement("canvas").getContext("2d")!;
-
-// fillStyle normalises any CSS colour to #rrggbb.
-export function cssColor(name: string): number {
-  parseCtx.fillStyle = getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-  return parseInt(String(parseCtx.fillStyle).slice(1), 16);
-}
-
-function mixColor(a: number, b: number, t: number): number {
-  let out = 0;
-  for (const shift of [16, 8, 0]) {
-    const ca = (a >> shift) & 0xff;
-    const cb = (b >> shift) & 0xff;
-    out |= Math.round(ca + (cb - ca) * t) << shift;
-  }
-  return out;
-}
+const { textureScale, hexGap, maxAlpha, glowRadius, glowStrength, fadeMs } =
+  config.view.slam;
 
 // White pointy-top hexagon of the given circumradius, centred in its texture.
 function hexTexture(radius: number): Texture {
-  const r = radius * TEXTURE_SCALE;
+  const r = radius * textureScale;
   const canvas = document.createElement("canvas");
   canvas.width = Math.ceil(Math.sqrt(3) * r);
   canvas.height = Math.ceil(2 * r);
@@ -68,14 +46,11 @@ export class SlamView {
   private glowing: Particle[] = [];
 
   constructor() {
-    matchMedia("(prefers-color-scheme: dark)").addEventListener(
-      "change",
-      () => {
-        this.color = cssColor("--slam");
-        this.glowColor = cssColor("--accent");
-        for (const p of this.container.particleChildren) p.tint = this.color;
-      },
-    );
+    onColorSchemeChange(() => {
+      this.color = cssColor("--slam");
+      this.glowColor = cssColor("--accent");
+      for (const p of this.container.particleChildren) p.tint = this.color;
+    });
   }
 
   update(grid: SlamGrid, robot: Vec2, view: Rect): void {
@@ -91,23 +66,29 @@ export class SlamView {
     this.updateGlow(grid, robot);
   }
 
+  // Fades the whole map in or out; the grid keeps its data while hidden.
+  fade(visible: boolean, deltaMs: number): void {
+    const step = deltaMs / fadeMs;
+    this.container.alpha = clamp(
+      this.container.alpha + (visible ? step : -step),
+      0,
+      1,
+    );
+  }
+
   private updateGlow(grid: SlamGrid, robot: Vec2): void {
     for (const p of this.glowing) p.tint = this.color;
     this.glowing = [];
     const particles = this.container.particleChildren;
-    const centre = grid.hexAt(robot);
-    const n = Math.ceil(GLOW_RADIUS / grid.cellSize) + 1;
-    for (let dq = -n; dq <= n; dq++) {
-      for (let dr = Math.max(-n, -dq - n); dr <= Math.min(n, -dq + n); dr++) {
-        const p =
-          particles[grid.indexOf({ q: centre.q + dq, r: centre.r + dr })];
-        if (!p) continue;
-        const d = Math.hypot(p.x - robot.x, p.y - robot.y) / GLOW_RADIUS;
-        if (d >= 1) continue;
-        const t = 1 - d * d * (3 - 2 * d);
-        p.tint = mixColor(this.color, this.glowColor, t * GLOW_STRENGTH);
-        this.glowing.push(p);
-      }
+    const n = Math.ceil(glowRadius / grid.layout.size) + 1;
+    for (const hex of hexesInRange(grid.layout.hexAt(robot), n)) {
+      const p = particles[grid.indexOf(hex)];
+      if (!p) continue;
+      const d = Math.hypot(p.x - robot.x, p.y - robot.y) / glowRadius;
+      if (d >= 1) continue;
+      const t = 1 - smoothstep(d);
+      p.tint = mixColor(this.color, this.glowColor, t * glowStrength);
+      this.glowing.push(p);
     }
   }
 
@@ -119,27 +100,27 @@ export class SlamView {
     for (let i = 0; i < particles.length; i++) {
       // Occupied (negative) cells clamp to fully transparent.
       const alpha = this.inView[i]
-        ? Math.max(0, grid.values[i]) / SLAM_MAX_VALUE
+        ? (Math.max(0, grid.values[i]) / grid.options.maxValue) * maxAlpha
         : 0;
       if (particles[i].alpha !== alpha) particles[i].alpha = alpha;
     }
   }
 
   private rebuild(grid: SlamGrid, view: Rect): void {
-    const width = grid.cellSize - HEX_GAP;
-    this.texture ??= hexTexture(width / Math.sqrt(3));
-    const halfW = width / 2;
-    const halfH = width / Math.sqrt(3);
+    const width = grid.layout.size - hexGap;
+    const radius = width / Math.sqrt(3);
+    this.texture ??= hexTexture(radius);
     this.inView = new Uint8Array(grid.values.length);
     const particles: Particle[] = [];
     for (let i = 0; i < grid.values.length; i++) {
-      const { x, y } = grid.centreOf(grid.hexOfIndex(i));
-      this.inView[i] = Number(
-        x - halfW >= view.x &&
-          x + halfW <= view.x + view.width &&
-          y - halfH >= view.y &&
-          y + halfH <= view.y + view.height,
-      );
+      const { x, y } = grid.layout.centreOf(grid.hexOfIndex(i));
+      const box = {
+        x: x - width / 2,
+        y: y - radius,
+        width,
+        height: 2 * radius,
+      };
+      this.inView[i] = Number(containsRect(view, box));
       particles.push(
         new Particle({
           texture: this.texture,
@@ -147,8 +128,8 @@ export class SlamView {
           y,
           anchorX: 0.5,
           anchorY: 0.5,
-          scaleX: 1 / TEXTURE_SCALE,
-          scaleY: 1 / TEXTURE_SCALE,
+          scaleX: 1 / textureScale,
+          scaleY: 1 / textureScale,
           tint: this.color,
           alpha: 0,
         }),

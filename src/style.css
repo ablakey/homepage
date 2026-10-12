@@ -2,7 +2,10 @@
   color-scheme: light dark;
 
   --max-width: 40rem;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --fg: #222;
+  --text: #444;
   --muted: #666;
   --accent: #a8541c;
   --accent-2: #8a4415;
@@ -14,11 +17,12 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --fg: #b8b8b8;
-    --muted: #999;
+    --text: #a0a0a0;
+    --muted: #858585;
     --accent: #e39a62;
     --accent-2: #c47a45;
     --bg: #1a1b1e;
-    --slam: #3b3c43;
+    --slam: #2e2f35;
     --border: #333;
   }
 }
@@ -30,6 +34,11 @@
 html {
   position: relative;
   min-height: 100%;
+}
+
+/* Links and buttons set their own cursor, so they keep it. */
+html.robot-click {
+  cursor: crosshair;
 }
 
 #overlay {
@@ -106,15 +115,21 @@ body {
   max-width: var(--max-width);
   margin: 3rem auto;
   padding: 0 2rem;
-  font:
-    14px/1.6 system-ui,
-    sans-serif;
-  color: var(--fg);
+  font: 14px/1.6 var(--font-sans);
+  color: var(--text);
   background: var(--bg);
 }
 
 a {
   color: inherit;
+}
+
+/* Background-coloured halo, as on map labels, lifts text off the SLAM map. */
+header,
+main {
+  text-shadow:
+    0 0 2px var(--bg),
+    0 0 4px var(--bg);
 }
 
 a:hover {
@@ -133,6 +148,7 @@ header {
 }
 
 .site-name {
+  font-family: var(--font-mono);
   font-weight: 600;
   font-size: 1.35rem;
   margin-right: 1rem;
@@ -151,6 +167,18 @@ header nav a {
 
 header nav a:hover {
   text-decoration: underline;
+}
+
+header nav a[aria-current="page"] {
+  color: var(--accent);
+  text-decoration: underline 2px;
+  text-underline-offset: 6px;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--fg);
 }
 
 h1 {
@@ -181,6 +209,13 @@ img {
 
 pre {
   overflow-x: auto;
+}
+
+pre,
+code,
+.posts time,
+.post-date {
+  font-family: var(--font-mono);
 }
 
 .posts {

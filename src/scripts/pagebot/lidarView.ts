@@ -1,24 +1,19 @@
 import { Particle, ParticleContainer, Texture } from "pixi.js";
-import type { Vec2 } from "./collision";
+import { config } from "./config";
+import type { Vec2 } from "../lib/geometry";
 
-const HIT_COLOR = 0x5b8fc7;
-const HIT_SIZE = 2;
+const { color, hitSize, lifetimeMs } = config.view.lidar;
 
-// Renders lidar hits as points that fade out over `lifetimeMs`.
+// Renders lidar hits as points that fade out over their lifetime.
 export class LidarView {
   readonly container = new ParticleContainer<Particle>({
     dynamicProperties: { position: false, color: true },
   });
-  private readonly lifetimeMs: number;
   // Parallel to container.particleChildren, oldest first.
   private readonly ages: number[] = [];
 
-  constructor(lifetimeMs = 1000) {
-    this.lifetimeMs = lifetimeMs;
-  }
-
   addHits(hits: readonly { point: Vec2 }[]): void {
-    const scale = HIT_SIZE / Texture.WHITE.width;
+    const scale = hitSize / Texture.WHITE.width;
     for (const { point } of hits) {
       this.container.addParticle(
         new Particle({
@@ -29,7 +24,7 @@ export class LidarView {
           anchorY: 0.5,
           scaleX: scale,
           scaleY: scale,
-          tint: HIT_COLOR,
+          tint: color,
         }),
       );
       this.ages.push(0);
@@ -41,8 +36,8 @@ export class LidarView {
     let expired = 0;
     for (let i = 0; i < this.ages.length; i++) {
       const age = (this.ages[i] += deltaMs);
-      if (age >= this.lifetimeMs) expired = i + 1;
-      else particles[i].alpha = 1 - age / this.lifetimeMs;
+      if (age >= lifetimeMs) expired = i + 1;
+      else particles[i].alpha = 1 - age / lifetimeMs;
     }
     if (expired > 0) {
       this.container.removeParticles(0, expired);

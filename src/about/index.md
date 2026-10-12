@@ -2,8 +2,6 @@
 title: About
 ---
 
-# About
-
 I have been working as a software engineer in the industrial/warehouse mobile robotics industry since 2013. I've independently designed and developed real-time monitoring software that currently manages a fleet of _over ten thousand robots operating worldwide._
 
 Today I lead a team of software engineers in developing mobile robot mapping, fleet configuration, and monitoring applications for Web, dashboard, and mobile uses in large warehouse spaces.

@@ -16,12 +16,40 @@ export interface Pose {
   heading: number;
 }
 
-export interface RayHit {
-  point: Vec2;
-  distance: number;
-  // null when the ray reached the world bounds without hitting a rect.
-  rect: Rect | null;
-}
+export const distance = (a: Vec2, b: Vec2) => Math.hypot(b.x - a.x, b.y - a.y);
+
+export const lerp = (a: Vec2, b: Vec2, t: number): Vec2 => ({
+  x: a.x + (b.x - a.x) * t,
+  y: a.y + (b.y - a.y) * t,
+});
+
+// Direction of travel from `a` to `b`, in the same convention as Pose.heading.
+export const headingTo = (a: Vec2, b: Vec2) => Math.atan2(b.y - a.y, b.x - a.x);
+
+// Normalises an angle to [-π, π].
+export const wrapAngle = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+
+export const inflateRect = (r: Rect, by: number): Rect => ({
+  x: r.x - by,
+  y: r.y - by,
+  width: r.width + 2 * by,
+  height: r.height + 2 * by,
+});
+
+export const containsRect = (outer: Rect, inner: Rect) =>
+  inner.x >= outer.x &&
+  inner.y >= outer.y &&
+  inner.x + inner.width <= outer.x + outer.width &&
+  inner.y + inner.height <= outer.y + outer.height;
+
+// Distance from `p` to the nearest edge of `rect`; negative when `p` lies outside.
+export const distanceInside = (p: Vec2, rect: Rect) =>
+  Math.min(
+    p.x - rect.x,
+    rect.x + rect.width - p.x,
+    p.y - rect.y,
+    rect.y + rect.height - p.y,
+  );
 
 // Parametric [entry, exit] interval of a ray along one axis slab.
 function slab(origin: number, dir: number, min: number, max: number) {

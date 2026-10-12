@@ -2,8 +2,6 @@
 title: Résumé
 ---
 
-# Résumé
-
 ## Work History
 
 ### Locus Robotics, Boston, MA — 2018–Present
