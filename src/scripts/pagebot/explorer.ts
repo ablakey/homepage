@@ -1,7 +1,6 @@
 import { config } from "./config";
 import { distance, distanceInside, type Vec2 } from "../lib/geometry";
-import type { Obstacles } from "../lib/obstacles";
-import { findReachable, planPath } from "../lib/planner";
+import type { Planner } from "../lib/planner";
 import type { Robot } from "./robot";
 import type { SlamGrid } from "../lib/slam";
 
@@ -11,16 +10,16 @@ const { giveUpMs, dwellMs, spacing, edgeCells } = config.explore;
 // Every target is remembered, reached or not, so unmappable spots (e.g. hugging text) aren't retried forever.
 export class Explorer {
   private readonly robot: Robot;
-  private readonly obstacles: Obstacles;
+  private readonly planner: Planner;
   private readonly slam: SlamGrid;
   private visited: Vec2[] = [];
   private exploring = false;
   // Time on the current target, or idle time since the last one.
   private elapsedMs = 0;
 
-  constructor(robot: Robot, obstacles: Obstacles, slam: SlamGrid) {
+  constructor(robot: Robot, planner: Planner, slam: SlamGrid) {
     this.robot = robot;
-    this.obstacles = obstacles;
+    this.planner = planner;
     this.slam = slam;
   }
 
@@ -39,7 +38,7 @@ export class Explorer {
 
   // Returns the new target whenever one is picked.
   update(deltaMs: number): Vec2 | null {
-    const { robot, obstacles, slam } = this;
+    const { robot, planner, slam } = this;
     this.elapsedMs += deltaMs;
     if (this.exploring) {
       if (!robot.idle && this.elapsedMs < giveUpMs) return null;
@@ -52,22 +51,18 @@ export class Explorer {
     this.elapsedMs = 0;
 
     const { position } = robot.pose;
-    const isKnown = (p: Vec2) => slam.isKnown(p);
-    const edge = edgeCells * slam.layout.size;
-    const target = findReachable(
-      obstacles,
-      isKnown,
+    const edge = edgeCells * slam.size;
+    const target = planner.findReachable(
       position,
       (p) =>
         distanceInside(p, slam.bounds) >= edge &&
         distance(p, position) >= spacing &&
         this.visited.every((v) => distance(p, v) >= spacing) &&
         slam.unmappedNeighbour(p) !== null,
-      config.planner,
     );
     if (!target) return null;
     this.visited.push(target);
-    const plan = planPath(obstacles, isKnown, position, target, config.planner);
+    const plan = planner.plan(position, target);
     if (!plan) return null;
     robot.setPath(plan.path, plan.lookAt ?? slam.unmappedNeighbour(target));
     this.exploring = true;

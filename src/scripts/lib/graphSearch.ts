@@ -1,10 +1,7 @@
 import { MinHeap } from "./minHeap";
 
-// Edges of a graph whose nodes are the integers 0..size-1: calls `visit` for each node one step from `node`.
-export type Neighbours = (
-  node: number,
-  visit: (next: number, cost: number) => void,
-) => void;
+// Edges of a graph whose nodes are the integers 0..size-1, all of length 1: calls `visit` for each node one step from `node`.
+export type Neighbours = (node: number, visit: (next: number) => void) => void;
 
 // Shortest path from `start` to `goal`, or null if unreachable. `heuristic` must never overestimate the remaining cost.
 export function aStar(
@@ -30,9 +27,9 @@ export function aStar(
     }
     if (closed[cur]) continue;
     closed[cur] = 1;
-    neighbours(cur, (next, cost) => {
+    neighbours(cur, (next) => {
       if (closed[next]) return;
-      const score = g[cur] + cost;
+      const score = g[cur] + 1;
       if (score < g[next]) {
         g[next] = score;
         parent[next] = cur;

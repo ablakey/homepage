@@ -2,7 +2,6 @@ import { Particle, ParticleContainer, Texture } from "pixi.js";
 import { cssColor, mixColor, onColorSchemeChange } from "../lib/color";
 import { config } from "./config";
 import { containsRect, type Rect, type Vec2 } from "../lib/geometry";
-import { hexesInRange } from "../lib/hex";
 import { clamp, smoothstep } from "../lib/math";
 import type { SlamGrid } from "../lib/slam";
 
@@ -80,9 +79,14 @@ export class SlamView {
     for (const p of this.glowing) p.tint = this.color;
     this.glowing = [];
     const particles = this.container.particleChildren;
-    const n = Math.ceil(glowRadius / grid.layout.size) + 1;
-    for (const hex of hexesInRange(grid.layout.hexAt(robot), n)) {
-      const p = particles[grid.indexOf(hex)];
+    const reach = {
+      x: robot.x - glowRadius,
+      y: robot.y - glowRadius,
+      width: 2 * glowRadius,
+      height: 2 * glowRadius,
+    };
+    for (const cell of grid.cellsNear(reach)) {
+      const p = particles[cell];
       if (!p) continue;
       const d = Math.hypot(p.x - robot.x, p.y - robot.y) / glowRadius;
       if (d >= 1) continue;
@@ -107,13 +111,13 @@ export class SlamView {
   }
 
   private rebuild(grid: SlamGrid, view: Rect): void {
-    const width = grid.layout.size - hexGap;
+    const width = grid.size - hexGap;
     const radius = width / Math.sqrt(3);
     this.texture ??= hexTexture(radius);
     this.inView = new Uint8Array(grid.values.length);
     const particles: Particle[] = [];
     for (let i = 0; i < grid.values.length; i++) {
-      const { x, y } = grid.layout.centreOf(grid.hexOfIndex(i));
+      const { x, y } = grid.centreOf(i);
       const box = {
         x: x - width / 2,
         y: y - radius,

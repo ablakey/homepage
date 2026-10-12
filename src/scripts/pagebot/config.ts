@@ -42,7 +42,7 @@ export const config = {
     layoutDebounceMs: 100,
   },
 
-  // Evidence grid on hexes; see lib/slam.ts.
+  // Evidence grid on hexes; see lib/slam.ts. The planner uses the same cells.
   slam: {
     // Distance between neighbouring hex centres.
     cellSize: 10,
@@ -53,8 +53,6 @@ export const config = {
   },
 
   planner: {
-    // Occupancy grid resolution.
-    cellSize: 4,
     // Minimum distance from robot centre to any obstacle; a little slack over the swept radius.
     clearance: ROBOT_RADIUS + 2,
     // While the goal lies beyond mapped space, extend the path this often as the map grows.

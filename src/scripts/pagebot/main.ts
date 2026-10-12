@@ -6,7 +6,7 @@ import { Obstacles } from "../lib/obstacles";
 import { createOverlay } from "./overlay";
 import { Page, stylesheetsLoaded } from "./page";
 import { PathView } from "./pathView";
-import { planPath } from "../lib/planner";
+import { Planner } from "../lib/planner";
 import { Robot } from "./robot";
 import { RobotView } from "./robotView";
 import { SlamGrid } from "../lib/slam";
@@ -22,6 +22,7 @@ await document.fonts.ready;
 const page = new Page(document.getElementById("overlay")!);
 const obstacles = new Obstacles();
 const slam = new SlamGrid(config.slam);
+const planner = new Planner(slam, obstacles, config.planner);
 const refreshObstacles = () => {
   const { width, height } = app.screen;
   const { margin } = config.world;
@@ -33,6 +34,7 @@ const refreshObstacles = () => {
   };
   obstacles.rects = page.obstacleRects();
   slam.setBounds(obstacles.bounds);
+  planner.refresh();
 };
 refreshObstacles();
 
@@ -41,7 +43,7 @@ const robot = new Robot({
   position: { ...home.position },
   heading: home.heading,
 });
-const explorer = new Explorer(robot, obstacles, slam);
+const explorer = new Explorer(robot, planner, slam);
 // A distant point along the home heading, for the robot to turn and face on arrival.
 const homeFacing = (): Vec2 => ({
   x: home.position.x + Math.cos(home.heading) * 1000,
@@ -67,18 +69,11 @@ let goalMarker: Vec2 | null = null;
 // Automap pauses exploring while driving to a clicked goal.
 let detour = false;
 let sinceReplanMs = 0;
-const isKnown = (p: Vec2) => slam.isKnown(p);
 
 const replan = () => {
   sinceReplanMs = 0;
   if (!goal) return;
-  const plan = planPath(
-    obstacles,
-    isKnown,
-    robot.pose.position,
-    goal,
-    config.planner,
-  );
+  const plan = planner.plan(robot.pose.position, goal);
   if (!plan) {
     goal = goalMarker = null;
     return;
