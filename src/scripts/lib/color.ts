@@ -19,11 +19,3 @@ export function mixColor(a: number, b: number, t: number): number {
   }
   return out;
 }
-
-// The CSS colour variables differ between light and dark schemes; re-read them when the scheme flips.
-export function onColorSchemeChange(listener: () => void): void {
-  matchMedia("(prefers-color-scheme: dark)").addEventListener(
-    "change",
-    listener,
-  );
-}

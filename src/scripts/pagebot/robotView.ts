@@ -1,13 +1,25 @@
 import { Graphics } from "pixi.js";
-import { cssColor, onColorSchemeChange } from "../lib/color";
+import { cssColor } from "../lib/color";
 import { config } from "./config";
+import { palette } from "./palette";
 import type { Pose } from "../lib/geometry";
 import { clamp, easeOutCubic } from "../lib/math";
 
 const { size } = config.robot;
-const { color, lineWidth, padding } = config.view.robot;
+const { lineWidth, padding } = config.view.robot;
 
-// Square body filled with the page background, with a line from centre to the front edge marking the heading.
+// Hexagon with the given distance from centre to each flat; corners at ±30°, ±90°, ±150° put a flat facing +x.
+function hexagon(apothem: number): number[] {
+  const r = apothem / Math.cos(Math.PI / 6);
+  const points: number[] = [];
+  for (let k = 0; k < 6; k++) {
+    const a = Math.PI / 6 + (k * Math.PI) / 3;
+    points.push(r * Math.cos(a), r * Math.sin(a));
+  }
+  return points;
+}
+
+// Hexagonal body filled with the page background, with a line from centre to the front face marking the heading.
 export class RobotView {
   readonly container = new Graphics();
   private introMs = matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -16,19 +28,17 @@ export class RobotView {
 
   constructor() {
     this.draw();
-    onColorSchemeChange(() => this.draw());
   }
 
   private draw(): void {
-    const outer = size / 2 + lineWidth / 2 + padding;
     this.container
       .clear()
-      .rect(-outer, -outer, 2 * outer, 2 * outer)
+      .poly(hexagon(size / 2 + lineWidth / 2 + padding))
       .fill(cssColor("--bg"))
-      .rect(-size / 2, -size / 2, size, size)
+      .poly(hexagon(size / 2))
       .moveTo(0, 0)
       .lineTo(size / 2, 0)
-      .stroke({ width: lineWidth, color });
+      .stroke({ width: lineWidth, color: palette.robot });
   }
 
   // Jump straight to the true pose, e.g. once the robot is activated mid-intro.

@@ -92,15 +92,10 @@ const driveTo = (p: Vec2) => {
 
 const setMode = (next: Mode) => {
   mode = next;
-  document.documentElement.classList.toggle(
-    "robot-click",
-    next === "click" || next === "automap",
-  );
+  document.documentElement.classList.toggle("robot-click", next === "automap");
   toolbar.select(next);
-  if (next !== "click") {
-    goal = goalMarker = null;
-    robot.setPath([]);
-  }
+  goal = goalMarker = null;
+  robot.setPath([]);
   if (next === "home") {
     goal = home.position;
     replan();
@@ -111,6 +106,14 @@ const setMode = (next: Mode) => {
   }
 };
 const toolbar = new Toolbar(document.querySelector("header")!, setMode);
+
+// Pauses exploring to drive to `p`; exploring resumes once the robot gets there.
+const detourTo = (p: Vec2) => {
+  detour = true;
+  explorer.interrupt();
+  robot.setPath([]);
+  driveTo(p);
+};
 
 const isOnRobot = (p: Vec2) =>
   distance(p, robot.pose.position) <= config.robot.clickRadius;
@@ -143,9 +146,9 @@ document.addEventListener("click", (event) => {
   const point = page.toWorld(event.pageX, event.pageY);
   if (isOnRobot(point)) {
     if (!mode) {
-      setMode("click");
+      setMode("automap");
       robotView.skipIntro();
-      driveTo(pickFirstGoal());
+      detourTo(pickFirstGoal());
       toolbarTimer = window.setTimeout(
         () => toolbar.show(),
         config.toolbar.showDelayMs,
@@ -153,19 +156,14 @@ document.addEventListener("click", (event) => {
     }
     return;
   }
-  if (mode !== "click" && mode !== "automap") return;
+  if (mode !== "automap") return;
   if (
     event.target instanceof Element &&
     event.target.closest("a, .robot-toolbar")
   ) {
     return;
   }
-  if (mode === "automap") {
-    detour = true;
-    explorer.interrupt();
-    robot.setPath([]);
-  }
-  driveTo(point);
+  detourTo(point);
 });
 
 // Reflowed text no longer matches the map or any plan, so park at home and start over.
@@ -218,13 +216,13 @@ app.ticker.add(({ deltaMS }) => {
 
   lidarView.addHits(readings.filter((r) => r.hit));
   lidarView.update(deltaMS);
-  slamView.update(slam, robot.pose.position, {
+  slamView.update(slam, robot.pose, {
     x: 0,
     y: 0,
     width: app.screen.width,
     height: app.screen.height,
   });
   slamView.fade(mode !== null, deltaMS);
-  pathView.update(robot.pose.position, robot.path, goalMarker, deltaMS);
+  pathView.update(robot.pose.position, robot.path, goalMarker, goal, deltaMS);
   robotView.update(robot.pose, deltaMS);
 });

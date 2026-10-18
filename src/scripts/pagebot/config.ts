@@ -1,10 +1,9 @@
 // Tunables for the robot overlay, grouped by subsystem. Distances are CSS px, durations ms unless noted, angles radians.
 
+// Across the hexagonal body's flats; one flat faces forward.
 const ROBOT_SIZE = 16;
-// Radius of the circle the square body sweeps when turning in place.
-const ROBOT_RADIUS = (ROBOT_SIZE / 2) * Math.SQRT2;
-const GREEN = 0x5e9e7c;
-const ORANGE = 0xcc6e30;
+// Radius of the circle the hexagonal body sweeps when turning in place: its corner radius.
+const ROBOT_RADIUS = ROBOT_SIZE / 2 / Math.cos(Math.PI / 6);
 
 export const config = {
   robot: {
@@ -25,7 +24,7 @@ export const config = {
   // Each scan splits `fov` (centred on the heading) into `raysPerScan` equal slots and fires one ray at a random angle within each.
   lidar: {
     fov: (120 * Math.PI) / 180,
-    scanRateHz: 30,
+    scanRateHz: 10,
     raysPerScan: 32,
     // Rays that travel further than this without hitting anything report a miss at this range.
     maxRange: 250,
@@ -56,7 +55,7 @@ export const config = {
     // Minimum distance from robot centre to any obstacle; a little slack over the swept radius.
     clearance: ROBOT_RADIUS + 2,
     // While the goal lies beyond mapped space, extend the path this often as the map grows.
-    replanMs: 300,
+    replanMs: 1000,
     chaikinIterations: 5,
     // Upper bound on how far from each corner the first rounding pass starts its curve.
     maxCornerCut: 60,
@@ -99,30 +98,37 @@ export const config = {
     startX: -ROBOT_SIZE * 1.5,
   },
 
+  // Colours come from palette.ts, which reads the CSS custom properties in style.css.
   view: {
     robot: {
-      color: ORANGE,
       lineWidth: 2,
       // Background-coloured margin beyond the outline, separating the robot from the map beneath.
       padding: 3,
     },
     lidar: {
-      color: GREEN,
       hitSize: 2,
+      // Opacity of a fresh hit, fading to 0 over lifetimeMs.
+      alpha: 0.6,
       lifetimeMs: 1000,
     },
     path: {
-      color: GREEN,
       width: 2,
       alpha: 0.6,
       ringRadius: 6,
       ringWidth: 2.5,
       rippleWidth: 1.5,
       dotRadius: 2,
+      // Dotted line from the end of a partial path to the goal it can't yet reach.
+      pendingDotRadius: 1,
+      pendingDotSpacing: 6,
       // A new goal's ring shrinks into place from this multiple of its radius over dropMs, then sends out one ripple.
       dropScale: 3,
       dropMs: 250,
       rippleMs: 700,
+      // On a replan the drawn path morphs from the old route to the new one over this long.
+      morphMs: 500,
+      // Both routes are resampled to this many evenly spaced points for the morph.
+      morphSamples: 96,
     },
     slam: {
       // Hex texture resolution per world pixel, so edges stay sharp on high-DPI screens and when zoomed.
@@ -131,10 +137,14 @@ export const config = {
       hexGap: 0.5,
       // Opacity of a fully mapped hex, keeping the map behind the text.
       maxAlpha: 0.8,
-      // Hexes within this distance of the robot are tinted towards the accent colour, fading out with distance.
-      glowRadius: 50,
+      // Hexes within this distance in front of the robot are tinted towards --glow, fading out with distance.
+      glowRadius: 80,
       // Tint mix at the robot's own hex.
-      glowStrength: 0.3,
+      glowStrength: 0.4,
+      // Width of the glow's wedge, centred on the heading; a little wider than the lidar's.
+      glowFov: (160 * Math.PI) / 180,
+      // The wedge's sides fade over this fraction of its half-angle.
+      glowEdge: 0.25,
       // The whole map fades in on activation and out once the robot is parked.
       fadeMs: 800,
     },

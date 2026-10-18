@@ -1,12 +1,22 @@
 import { Particle, ParticleContainer, Texture } from "pixi.js";
-import { cssColor, mixColor, onColorSchemeChange } from "../lib/color";
+import { cssColor, mixColor } from "../lib/color";
 import { config } from "./config";
-import { containsRect, type Rect, type Vec2 } from "../lib/geometry";
+import { palette } from "./palette";
+import { containsRect, type Pose, type Rect } from "../lib/geometry";
 import { clamp, smoothstep } from "../lib/math";
 import type { SlamGrid } from "../lib/slam";
 
-const { textureScale, hexGap, maxAlpha, glowRadius, glowStrength, fadeMs } =
-  config.view.slam;
+const {
+  textureScale,
+  hexGap,
+  maxAlpha,
+  glowRadius,
+  glowStrength,
+  glowEdge,
+  glowFov,
+  fadeMs,
+} = config.view.slam;
+const glowHalfAngle = glowFov / 2;
 
 // White pointy-top hexagon of the given circumradius, centred in its texture.
 function hexTexture(radius: number): Texture {
@@ -40,19 +50,10 @@ export class SlamView {
   // 1 for hexes lying wholly inside the visible area; the rest stay hidden rather than appear clipped.
   private inView = new Uint8Array(0);
   private color = cssColor("--slam");
-  private glowColor = cssColor("--accent");
   // Particles currently tinted by the glow, to restore next frame.
   private glowing: Particle[] = [];
 
-  constructor() {
-    onColorSchemeChange(() => {
-      this.color = cssColor("--slam");
-      this.glowColor = cssColor("--accent");
-      for (const p of this.container.particleChildren) p.tint = this.color;
-    });
-  }
-
-  update(grid: SlamGrid, robot: Vec2, view: Rect): void {
+  update(grid: SlamGrid, robot: Pose, view: Rect): void {
     const { cols, rows, bounds } = grid;
     const layout = `${cols}x${rows}@${bounds.x},${bounds.y} ${view.x},${view.y},${view.width},${view.height}`;
     if (layout !== this.layout) {
@@ -75,7 +76,7 @@ export class SlamView {
     );
   }
 
-  private updateGlow(grid: SlamGrid, robot: Vec2): void {
+  private updateGlow(grid: SlamGrid, { position: robot, heading }: Pose): void {
     for (const p of this.glowing) p.tint = this.color;
     this.glowing = [];
     const particles = this.container.particleChildren;
@@ -90,8 +91,16 @@ export class SlamView {
       if (!p) continue;
       const d = Math.hypot(p.x - robot.x, p.y - robot.y) / glowRadius;
       if (d >= 1) continue;
-      const t = 1 - smoothstep(d);
-      p.tint = mixColor(this.color, this.glowColor, t * glowStrength);
+      const a = Math.atan2(p.y - robot.y, p.x - robot.x) - heading;
+      const offAxis = Math.abs(Math.atan2(Math.sin(a), Math.cos(a)));
+      const side = clamp(
+        (glowHalfAngle - offAxis) / (glowEdge * glowHalfAngle),
+        0,
+        1,
+      );
+      if (side === 0) continue;
+      const t = (1 - smoothstep(d)) * smoothstep(side);
+      p.tint = mixColor(this.color, palette.glow, t * glowStrength);
       this.glowing.push(p);
     }
   }

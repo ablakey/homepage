@@ -1,8 +1,9 @@
 import { Particle, ParticleContainer, Texture } from "pixi.js";
 import { config } from "./config";
+import { palette } from "./palette";
 import type { Vec2 } from "../lib/geometry";
 
-const { color, hitSize, lifetimeMs } = config.view.lidar;
+const { hitSize, alpha, lifetimeMs } = config.view.lidar;
 
 // Renders lidar hits as points that fade out over their lifetime.
 export class LidarView {
@@ -24,7 +25,8 @@ export class LidarView {
           anchorY: 0.5,
           scaleX: scale,
           scaleY: scale,
-          tint: color,
+          tint: palette.lidar,
+          alpha,
         }),
       );
       this.ages.push(0);
@@ -37,7 +39,7 @@ export class LidarView {
     for (let i = 0; i < this.ages.length; i++) {
       const age = (this.ages[i] += deltaMs);
       if (age >= lifetimeMs) expired = i + 1;
-      else particles[i].alpha = 1 - age / lifetimeMs;
+      else particles[i].alpha = alpha * (1 - age / lifetimeMs);
     }
     if (expired > 0) {
       this.container.removeParticles(0, expired);
