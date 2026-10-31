@@ -2,7 +2,7 @@ import { Particle, ParticleContainer, Texture } from "pixi.js";
 import { mixColor } from "../lib/color";
 import { config } from "./config";
 import { palette } from "./palette";
-import { containsRect, hexagon, type Pose, type Rect } from "../lib/geometry";
+import { hexagon, type Pose } from "../lib/geometry";
 import { clamp, smoothstep } from "../lib/math";
 import type { SlamGrid } from "../lib/slam";
 
@@ -36,6 +36,7 @@ function hexTexture(radius: number): Texture {
 }
 
 // One tinted hex particle per grid cell; alpha tracks evidence, tint glows near the robot.
+// The grid overhangs every canvas edge, so the map runs cleanly off the sides.
 export class SlamView {
   readonly container = new ParticleContainer<Particle>({
     dynamicProperties: { position: false, color: true },
@@ -44,19 +45,17 @@ export class SlamView {
   private texture: Texture | null = null;
   private layout = "";
   private drawnVersion = -1;
-  // 1 for hexes lying wholly inside the visible area; the rest stay hidden rather than appear clipped.
-  private inView = new Uint8Array(0);
   // Particles currently tinted by the glow, to restore next frame.
   private glowing: Particle[] = [];
 
-  update(grid: SlamGrid, robot: Pose, view: Rect): void {
+  update(grid: SlamGrid, robot: Pose): void {
     const { cols, rows, bounds } = grid;
-    const layout = `${cols}x${rows}@${bounds.x},${bounds.y} ${view.x},${view.y},${view.width},${view.height}`;
+    const layout = `${cols}x${rows}@${bounds.x},${bounds.y}`;
     if (layout !== this.layout) {
       this.layout = layout;
       this.glowing = [];
       this.drawnVersion = -1;
-      this.rebuild(grid, view);
+      this.rebuild(grid);
     }
     this.updateAlpha(grid);
     this.updateGlow(grid, robot);
@@ -108,28 +107,18 @@ export class SlamView {
     const particles = this.container.particleChildren;
     for (let i = 0; i < particles.length; i++) {
       // Occupied (negative) cells clamp to fully transparent.
-      const alpha = this.inView[i]
-        ? (Math.max(0, grid.values[i]) / grid.options.maxValue) * maxAlpha
-        : 0;
+      const alpha =
+        (Math.max(0, grid.values[i]) / grid.options.maxValue) * maxAlpha;
       if (particles[i].alpha !== alpha) particles[i].alpha = alpha;
     }
   }
 
-  private rebuild(grid: SlamGrid, view: Rect): void {
-    const width = grid.size - hexGap;
-    const radius = width / Math.sqrt(3);
+  private rebuild(grid: SlamGrid): void {
+    const radius = (grid.size - hexGap) / Math.sqrt(3);
     this.texture ??= hexTexture(radius);
-    this.inView = new Uint8Array(grid.values.length);
     const particles: Particle[] = [];
     for (let i = 0; i < grid.values.length; i++) {
       const { x, y } = grid.centreOf(i);
-      const box = {
-        x: x - width / 2,
-        y: y - radius,
-        width,
-        height: 2 * radius,
-      };
-      this.inView[i] = Number(containsRect(view, box));
       particles.push(
         new Particle({
           texture: this.texture,

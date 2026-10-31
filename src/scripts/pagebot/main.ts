@@ -213,23 +213,15 @@ const step = (deltaMS: number) => {
 
   lidarView.addHits(readings.filter((r) => r.hit));
   lidarView.update(deltaMS);
-  const view = {
-    x: 0,
-    y: 0,
-    width: app.screen.width,
-    height: app.screen.height,
-  };
-  slamView.update(slam, robot.pose, view);
+  slamView.update(slam, robot.pose);
   slamView.fade(mode !== null, deltaMS);
+  robotView.update(robot.pose, deltaMS);
   pulseView.update(
-    slam,
     robot.pose.position,
-    view,
     mode === null && robotView.settled,
     deltaMS,
   );
   pathView.update(robot.pose.position, robot.path, goalMarker, goal, deltaMS);
-  robotView.update(robot.pose, deltaMS);
 };
 // Pixi also renders on resize, outside the ticker, so place every view before that can happen.
 step(0);

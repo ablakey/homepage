@@ -12,11 +12,11 @@ export const config = {
     // Pointer events within this distance of the robot centre land on the robot.
     clickRadius: ROBOT_RADIUS + 4,
     // px/s.
-    maxSpeed: 100,
+    maxSpeed: 75,
     // px/s², both speeding up and braking for the end of the path.
-    acceleration: 150,
+    acceleration: 80,
     // rad/s.
-    turnRate: 0.75 * Math.PI,
+    turnRate: 0.65 * Math.PI,
     // Heading errors larger than this are sharp kinks: the robot stops and pivots, then accelerates away again.
     pivotAngle: Math.PI / 6,
   },
@@ -27,7 +27,7 @@ export const config = {
     scanRateHz: 10,
     raysPerScan: 32,
     // Rays that travel further than this without hitting anything report a miss at this range.
-    maxRange: 250,
+    maxRange: 300,
     // Standard deviation of Gaussian noise applied to each hit's range.
     rangeNoise: 1.5,
   },
@@ -55,7 +55,7 @@ export const config = {
     // Minimum distance from robot centre to any obstacle; a little slack over the swept radius.
     clearance: ROBOT_RADIUS + 2,
     // While the goal lies beyond mapped space, extend the path this often as the map grows.
-    replanMs: 1000,
+    replanMs: 500,
     chaikinIterations: 5,
     // Upper bound on how far from each corner the first rounding pass starts its curve.
     maxCornerCut: 60,
@@ -103,14 +103,9 @@ export const config = {
     robot: {
       lineWidth: 2,
     },
-    // While idle, a ring of SLAM hexes ripples out from beneath the robot to invite a click.
+    // While idle, the robot sends out a ripple like a new goal's to invite a click.
     pulse: {
-      // Random gap between pulses.
-      intervalMs: [3000, 4000],
-      durationMs: 900,
-      // How many hexes out the ring travels.
-      rings: 4,
-      alpha: 0.6,
+      intervalMs: 2500,
     },
     lidar: {
       hitSize: 2,

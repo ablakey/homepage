@@ -16,9 +16,14 @@
   </head>
   <body>
     <header>
-      <span class="site-name">Blakey's Page</span>
+      <a
+        class="site-name"
+        href="/"
+        {% if page.url == "/" %}aria-current="page"{% endif %}
+        >Blakey's Page</a
+      >
       <nav>
-        {%- for link in [["/", "Posts"], ["/about/", "About"], ["/resume/", "Résumé"]] %}
+        {%- for link in [["/about/", "About"], ["/resume/", "Résumé"]] %}
           <a
             href="{{ link[0] }}"
             {% if page.url == link[0] %}aria-current="page"{% endif %}

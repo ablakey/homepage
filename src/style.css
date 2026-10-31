@@ -105,7 +105,7 @@ html.robot-click {
 body {
   max-width: var(--max-width);
   margin: 3rem auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   font: 14px/1.6 var(--font-sans);
   color: var(--text);
   background: var(--bg);
@@ -142,8 +142,9 @@ header {
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 1.35rem;
-  margin-right: 1rem;
+  margin-right: 0.8rem;
   color: var(--robot);
+  text-decoration: none;
 }
 
 header nav {
@@ -151,7 +152,7 @@ header nav {
 }
 
 header nav a {
-  margin-right: 1rem;
+  margin-right: 0.8rem;
   text-decoration: none;
   color: var(--muted);
 }
@@ -185,7 +186,7 @@ h2 {
 
 h3 {
   font-size: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
 

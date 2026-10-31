@@ -36,12 +36,6 @@ export const inflateRect = (r: Rect, by: number): Rect => ({
   height: r.height + 2 * by,
 });
 
-export const containsRect = (outer: Rect, inner: Rect) =>
-  inner.x >= outer.x &&
-  inner.y >= outer.y &&
-  inner.x + inner.width <= outer.x + outer.width &&
-  inner.y + inner.height <= outer.y + outer.height;
-
 // Corners of a pointy-top hexagon (flats facing ±x) as a flat [x0, y0, x1, y1, ...] list.
 export function hexagon(radius: number, cx = 0, cy = 0): number[] {
   const points: number[] = [];
