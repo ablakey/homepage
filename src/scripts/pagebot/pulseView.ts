@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
 import { config } from "./config";
 import { palette } from "./palette";
-import { containsRect, type Rect, type Vec2 } from "../lib/geometry";
+import { containsRect, hexagon, type Rect, type Vec2 } from "../lib/geometry";
 import type { HexGrid } from "../lib/hexGrid";
 import { easeOutCubic } from "../lib/math";
 
@@ -11,16 +11,6 @@ const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const nextPulseMs = () =>
   intervalMs[0] + Math.random() * (intervalMs[1] - intervalMs[0]);
-
-// Pointy-top hexagon with circumradius `r` centred on (x, y), matching the SLAM hexes.
-function hexagon(x: number, y: number, r: number): number[] {
-  const points: number[] = [];
-  for (let k = 0; k < 6; k++) {
-    const a = Math.PI / 6 + (k * Math.PI) / 3;
-    points.push(x + r * Math.cos(a), y + r * Math.sin(a));
-  }
-  return points;
-}
 
 // Now and then while enabled, lights a ring of grid hexes that travels outwards from `centre` and fades.
 export class PulseView {
@@ -67,7 +57,7 @@ export class PulseView {
       // Hexes the canvas edge would clip stay hidden, as on the map.
       const box = { x: x - width / 2, y: y - r, width, height: 2 * r };
       if (!containsRect(view, box)) continue;
-      g.poly(hexagon(x, y, r)).fill({
+      g.poly(hexagon(r, x, y)).fill({
         color: palette.robot,
         alpha: alpha * strength * (1 - u),
       });

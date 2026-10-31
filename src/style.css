@@ -8,7 +8,7 @@
   --text: #a0a0a0;
   --muted: #858585;
   --accent: #9e165e;
-  /* --accent: #00a748; */
+
   /* Also the site name, stars and list bullets. */
   --robot: #00a748;
   --lidar: var(--glow);

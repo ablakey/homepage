@@ -1,22 +1,11 @@
 import { Graphics } from "pixi.js";
 import { config } from "./config";
 import { palette } from "./palette";
-import type { Pose } from "../lib/geometry";
+import { hexagon, type Pose } from "../lib/geometry";
 import { clamp, easeOutCubic } from "../lib/math";
 
-const { size } = config.robot;
+const { size, radius } = config.robot;
 const { lineWidth } = config.view.robot;
-
-// Hexagon with the given distance from centre to each flat; corners at ±30°, ±90°, ±150° put a flat facing +x.
-function hexagon(apothem: number): number[] {
-  const r = apothem / Math.cos(Math.PI / 6);
-  const points: number[] = [];
-  for (let k = 0; k < 6; k++) {
-    const a = Math.PI / 6 + (k * Math.PI) / 3;
-    points.push(r * Math.cos(a), r * Math.sin(a));
-  }
-  return points;
-}
 
 // Hexagonal body filled with the page background, with a line from centre to the front face marking the heading.
 export class RobotView {
@@ -37,9 +26,9 @@ export class RobotView {
   private draw(): void {
     this.container
       .clear()
-      .poly(hexagon(size / 2))
+      .poly(hexagon(radius))
       .fill(palette.bg)
-      .poly(hexagon(size / 2))
+      .poly(hexagon(radius))
       .moveTo(0, 0)
       .lineTo(size / 2, 0)
       .stroke({ width: lineWidth, color: palette.robot });

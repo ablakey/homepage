@@ -42,6 +42,16 @@ export const containsRect = (outer: Rect, inner: Rect) =>
   inner.x + inner.width <= outer.x + outer.width &&
   inner.y + inner.height <= outer.y + outer.height;
 
+// Corners of a pointy-top hexagon (flats facing ±x) as a flat [x0, y0, x1, y1, ...] list.
+export function hexagon(radius: number, cx = 0, cy = 0): number[] {
+  const points: number[] = [];
+  for (let k = 0; k < 6; k++) {
+    const a = Math.PI / 6 + (k * Math.PI) / 3;
+    points.push(cx + radius * Math.cos(a), cy + radius * Math.sin(a));
+  }
+  return points;
+}
+
 // Distance from `p` to the nearest edge of `rect`; negative when `p` lies outside.
 export const distanceInside = (p: Vec2, rect: Rect) =>
   Math.min(

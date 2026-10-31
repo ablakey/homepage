@@ -2,7 +2,7 @@ import { Particle, ParticleContainer, Texture } from "pixi.js";
 import { mixColor } from "../lib/color";
 import { config } from "./config";
 import { palette } from "./palette";
-import { containsRect, type Pose, type Rect } from "../lib/geometry";
+import { containsRect, hexagon, type Pose, type Rect } from "../lib/geometry";
 import { clamp, smoothstep } from "../lib/math";
 import type { SlamGrid } from "../lib/slam";
 
@@ -26,13 +26,10 @@ function hexTexture(radius: number): Texture {
   canvas.height = Math.ceil(2 * r);
   const ctx = canvas.getContext("2d")!;
   ctx.fillStyle = "#fff";
+  const points = hexagon(r, canvas.width / 2, canvas.height / 2);
   ctx.beginPath();
-  for (let k = 0; k < 6; k++) {
-    const a = Math.PI / 6 + (k * Math.PI) / 3;
-    ctx.lineTo(
-      canvas.width / 2 + r * Math.cos(a),
-      canvas.height / 2 + r * Math.sin(a),
-    );
+  for (let i = 0; i < points.length; i += 2) {
+    ctx.lineTo(points[i], points[i + 1]);
   }
   ctx.fill();
   return Texture.from(canvas);

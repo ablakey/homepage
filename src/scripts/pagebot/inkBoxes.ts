@@ -1,4 +1,4 @@
-// All coordinates are document (overlay canvas) coordinates.
+// Tight per-character ink boxes for the page text, in document coordinates.
 
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT"]);
 

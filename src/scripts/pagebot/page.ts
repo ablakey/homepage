@@ -1,6 +1,6 @@
 import { config } from "./config";
 import { inflateRect, type Rect, type Vec2 } from "../lib/geometry";
-import { computeInkBoxes } from "./textMesh";
+import { computeInkBoxes } from "./inkBoxes";
 
 // Vite emits the stylesheet after the entry module; on a cold cache we could otherwise measure unstyled layout.
 export async function stylesheetsLoaded(): Promise<void> {

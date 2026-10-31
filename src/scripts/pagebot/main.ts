@@ -12,7 +12,7 @@ import { Robot } from "./robot";
 import { RobotView } from "./robotView";
 import { SlamGrid } from "../lib/slam";
 import { SlamView } from "./slamView";
-import { Toolbar, type Mode } from "./toolbar";
+import { Toolbar } from "./toolbar";
 
 const { clearance } = config.planner;
 
@@ -65,11 +65,11 @@ app.stage.addChild(
 );
 
 // Null until the robot is first clicked, and again once it has gone home; nothing moves or senses then.
-let mode: Mode | null = null;
+let mode: "explore" | "home" | null = null;
 let goal: Vec2 | null = null;
 // Outlives `goal` (cleared once fully planned) until the robot actually arrives.
 let goalMarker: Vec2 | null = null;
-// Automap pauses exploring while driving to a clicked goal.
+// Exploring pauses while driving to a clicked goal.
 let detour = false;
 let sinceReplanMs = 0;
 
@@ -93,23 +93,6 @@ const driveTo = (p: Vec2) => {
   replan();
 };
 
-const setMode = (next: Mode) => {
-  mode = next;
-  document.documentElement.classList.toggle("robot-click", next === "automap");
-  toolbar.select(next);
-  goal = goalMarker = null;
-  robot.setPath([]);
-  if (next === "home") {
-    goal = home.position;
-    replan();
-  }
-  if (next === "automap") {
-    explorer.reset();
-    detour = false;
-  }
-};
-const toolbar = new Toolbar(document.querySelector("header")!, setMode);
-
 // Pauses exploring to drive to `p`; exploring resumes once the robot gets there.
 const detourTo = (p: Vec2) => {
   detour = true;
@@ -117,6 +100,16 @@ const detourTo = (p: Vec2) => {
   robot.setPath([]);
   driveTo(p);
 };
+
+const goHome = () => {
+  mode = "home";
+  document.documentElement.classList.remove("robot-click");
+  goalMarker = null;
+  goal = home.position;
+  robot.setPath([]);
+  replan();
+};
+const toolbar = new Toolbar(document.querySelector("header")!, goHome);
 
 const isOnRobot = (p: Vec2) =>
   distance(p, robot.pose.position) <= config.robot.clickRadius;
@@ -149,8 +142,10 @@ document.addEventListener("click", (event) => {
   const point = page.toWorld(event.pageX, event.pageY);
   if (isOnRobot(point)) {
     if (!mode) {
-      setMode("automap");
+      mode = "explore";
+      document.documentElement.classList.add("robot-click");
       robotView.skipIntro();
+      explorer.reset();
       detourTo(pickFirstGoal());
       toolbarTimer = window.setTimeout(
         () => toolbar.show(),
@@ -159,7 +154,7 @@ document.addEventListener("click", (event) => {
     }
     return;
   }
-  if (mode !== "automap") return;
+  if (mode !== "explore") return;
   if (
     event.target instanceof Element &&
     event.target.closest("a, .robot-toolbar")
@@ -201,20 +196,19 @@ app.ticker.add(({ deltaMS }) => {
   for (const reading of readings) slam.addReading(reading);
   sinceReplanMs += deltaMS;
   if (goal && sinceReplanMs >= config.planner.replanMs) replan();
-  if (mode === "automap") {
+  if (mode === "explore") {
     if (detour && !goal && robot.idle) detour = false;
     if (!detour) goalMarker = explorer.update(deltaMS) ?? goalMarker;
   }
-  const arrived = !goal && robot.path.length === 0;
-  if (arrived) goalMarker = null;
+  if (!goal && robot.path.length === 0) goalMarker = null;
   if (mode === "home") {
     if (
       distance(robot.pose.position, home.position) < config.toolbar.hideDistance
     ) {
       toolbar.hide();
     }
-    const facingHome = Math.cos(robot.pose.heading - home.heading) > 0.9999;
-    if (arrived && facingHome) mode = null;
+    // Idle includes having turned to face along the home heading.
+    if (!goal && robot.idle) mode = null;
   }
 
   lidarView.addHits(readings.filter((r) => r.hit));
