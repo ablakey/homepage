@@ -9,8 +9,8 @@ export const config = {
   robot: {
     size: ROBOT_SIZE,
     radius: ROBOT_RADIUS,
-    // Pointer events within this distance of the robot centre land on the robot.
-    clickRadius: ROBOT_RADIUS + 4,
+    // Pointer events within this distance of the robot centre land on the robot, even over links; roomy for fingers.
+    clickRadius: ROBOT_RADIUS + 12,
     // px/s.
     maxSpeed: 75,
     // px/s², both speeding up and braking for the end of the path.

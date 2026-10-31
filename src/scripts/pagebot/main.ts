@@ -138,31 +138,40 @@ document.addEventListener("mousemove", (event) => {
 });
 
 let toolbarTimer = 0;
-document.addEventListener("click", (event) => {
-  const point = page.toWorld(event.pageX, event.pageY);
-  if (isOnRobot(point)) {
-    if (!mode) {
-      mode = "explore";
-      document.documentElement.classList.add("robot-click");
-      robotView.skipIntro();
-      explorer.reset();
-      detourTo(pickFirstGoal());
-      toolbarTimer = window.setTimeout(
-        () => toolbar.show(),
-        config.toolbar.showDelayMs,
-      );
+// Capture phase, so a tap near the robot beats any link underneath it.
+document.addEventListener(
+  "click",
+  (event) => {
+    const point = page.toWorld(event.pageX, event.pageY);
+    const inToolbar =
+      event.target instanceof Element && event.target.closest(".robot-toolbar");
+    if (isOnRobot(point) && !inToolbar) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!mode) {
+        mode = "explore";
+        document.documentElement.classList.add("robot-click");
+        robotView.skipIntro();
+        explorer.reset();
+        detourTo(pickFirstGoal());
+        toolbarTimer = window.setTimeout(
+          () => toolbar.show(),
+          config.toolbar.showDelayMs,
+        );
+      }
+      return;
     }
-    return;
-  }
-  if (mode !== "explore") return;
-  if (
-    event.target instanceof Element &&
-    event.target.closest("a, .robot-toolbar")
-  ) {
-    return;
-  }
-  detourTo(point);
-});
+    if (mode !== "explore") return;
+    if (
+      event.target instanceof Element &&
+      event.target.closest("a, .robot-toolbar")
+    ) {
+      return;
+    }
+    detourTo(point);
+  },
+  { capture: true },
+);
 
 // Reflowed text no longer matches the map or any plan, so park at home and start over.
 const reset = () => {
