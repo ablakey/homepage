@@ -6,4 +6,6 @@ export const palette = {
   accent: cssColor("--accent"),
   lidar: cssColor("--lidar"),
   glow: cssColor("--glow"),
+  bg: cssColor("--bg"),
+  slam: cssColor("--slam"),
 };

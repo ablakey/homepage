@@ -7,6 +7,7 @@ import { createOverlay } from "./overlay";
 import { Page, stylesheetsLoaded } from "./page";
 import { PathView } from "./pathView";
 import { Planner } from "../lib/planner";
+import { PulseView } from "./pulseView";
 import { Robot } from "./robot";
 import { RobotView } from "./robotView";
 import { SlamGrid } from "../lib/slam";
@@ -54,8 +55,10 @@ const robotView = new RobotView();
 const lidarView = new LidarView();
 const pathView = new PathView();
 const slamView = new SlamView();
+const pulseView = new PulseView();
 app.stage.addChild(
   slamView.container,
+  pulseView.container,
   pathView.container,
   lidarView.container,
   robotView.container,
@@ -216,13 +219,21 @@ app.ticker.add(({ deltaMS }) => {
 
   lidarView.addHits(readings.filter((r) => r.hit));
   lidarView.update(deltaMS);
-  slamView.update(slam, robot.pose, {
+  const view = {
     x: 0,
     y: 0,
     width: app.screen.width,
     height: app.screen.height,
-  });
+  };
+  slamView.update(slam, robot.pose, view);
   slamView.fade(mode !== null, deltaMS);
+  pulseView.update(
+    slam,
+    robot.pose.position,
+    view,
+    mode === null && robotView.settled,
+    deltaMS,
+  );
   pathView.update(robot.pose.position, robot.path, goalMarker, goal, deltaMS);
   robotView.update(robot.pose, deltaMS);
 });

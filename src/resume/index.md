@@ -6,7 +6,7 @@ title: Résumé
 
 ### Locus Robotics, Boston, MA — 2018–Present
 
-Design, develop, and manage fleet configuration and real-time monitoring systems for tens of thousands of mobile robots worldwide.
+I built and manage the fleet management and monitoring systems for over 15,000 warehouse robots deployed worldwide.
 
 - **Principal Software Engineer**, Tools Team Lead (2023–Present)
 - **Staff Software Engineer**, Tools Team Lead (2018–2023)

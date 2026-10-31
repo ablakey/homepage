@@ -11,13 +11,6 @@ const BUTTONS: readonly { mode: Mode; label: string; icon: string }[] = [
       '<path d="M2.5 7.5 8 3l5.5 4.5"/><path d="M4 6.5V13h8V6.5"/><path d="M6.5 13v-3h3v3"/>',
     ),
   },
-  {
-    mode: "automap",
-    label: "Automap",
-    icon: svg(
-      '<circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.5"/><path d="M8 8l4.2-4.2"/>',
-    ),
-  },
 ];
 
 // Icon-only mode picker; positioned by CSS within `parent`.

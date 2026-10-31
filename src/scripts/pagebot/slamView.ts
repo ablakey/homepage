@@ -1,5 +1,5 @@
 import { Particle, ParticleContainer, Texture } from "pixi.js";
-import { cssColor, mixColor } from "../lib/color";
+import { mixColor } from "../lib/color";
 import { config } from "./config";
 import { palette } from "./palette";
 import { containsRect, type Pose, type Rect } from "../lib/geometry";
@@ -49,7 +49,6 @@ export class SlamView {
   private drawnVersion = -1;
   // 1 for hexes lying wholly inside the visible area; the rest stay hidden rather than appear clipped.
   private inView = new Uint8Array(0);
-  private color = cssColor("--slam");
   // Particles currently tinted by the glow, to restore next frame.
   private glowing: Particle[] = [];
 
@@ -77,7 +76,7 @@ export class SlamView {
   }
 
   private updateGlow(grid: SlamGrid, { position: robot, heading }: Pose): void {
-    for (const p of this.glowing) p.tint = this.color;
+    for (const p of this.glowing) p.tint = palette.slam;
     this.glowing = [];
     const particles = this.container.particleChildren;
     const reach = {
@@ -100,7 +99,7 @@ export class SlamView {
       );
       if (side === 0) continue;
       const t = (1 - smoothstep(d)) * smoothstep(side);
-      p.tint = mixColor(this.color, palette.glow, t * glowStrength);
+      p.tint = mixColor(palette.slam, palette.glow, t * glowStrength);
       this.glowing.push(p);
     }
   }
@@ -143,7 +142,7 @@ export class SlamView {
           anchorY: 0.5,
           scaleX: 1 / textureScale,
           scaleY: 1 / textureScale,
-          tint: this.color,
+          tint: palette.slam,
           alpha: 0,
         }),
       );

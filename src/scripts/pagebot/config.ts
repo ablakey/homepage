@@ -102,8 +102,15 @@ export const config = {
   view: {
     robot: {
       lineWidth: 2,
-      // Background-coloured margin beyond the outline, separating the robot from the map beneath.
-      padding: 3,
+    },
+    // While idle, a ring of SLAM hexes ripples out from beneath the robot to invite a click.
+    pulse: {
+      // Random gap between pulses.
+      intervalMs: [3000, 4000],
+      durationMs: 900,
+      // How many hexes out the ring travels.
+      rings: 4,
+      alpha: 0.6,
     },
     lidar: {
       hitSize: 2,

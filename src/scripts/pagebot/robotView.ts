@@ -1,12 +1,11 @@
 import { Graphics } from "pixi.js";
-import { cssColor } from "../lib/color";
 import { config } from "./config";
 import { palette } from "./palette";
 import type { Pose } from "../lib/geometry";
 import { clamp, easeOutCubic } from "../lib/math";
 
 const { size } = config.robot;
-const { lineWidth, padding } = config.view.robot;
+const { lineWidth } = config.view.robot;
 
 // Hexagon with the given distance from centre to each flat; corners at ±30°, ±90°, ±150° put a flat facing +x.
 function hexagon(apothem: number): number[] {
@@ -30,11 +29,16 @@ export class RobotView {
     this.draw();
   }
 
+  // True once the intro has finished rolling the robot into place.
+  get settled(): boolean {
+    return this.introMs >= config.intro.delayMs + config.intro.durationMs;
+  }
+
   private draw(): void {
     this.container
       .clear()
-      .poly(hexagon(size / 2 + lineWidth / 2 + padding))
-      .fill(cssColor("--bg"))
+      .poly(hexagon(size / 2))
+      .fill(palette.bg)
       .poly(hexagon(size / 2))
       .moveTo(0, 0)
       .lineTo(size / 2, 0)
