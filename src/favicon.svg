@@ -1,4 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <text x="50" y="50" font-size="100" text-anchor="middle" dominant-baseline="central">🌐</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The page robot: hex body (pointy-top, flat facing right) with its heading line. -->
+  <g stroke="#00a748" stroke-width="3">
+    <polygon points="28.12,23 16,30 3.88,23 3.88,9 16,2 28.12,9" fill="#131416" />
+    <path d="M16 16H28.12" />
+  </g>
 </svg>
 

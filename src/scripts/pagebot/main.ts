@@ -191,7 +191,7 @@ new ResizeObserver(() => {
   }, config.world.layoutDebounceMs);
 }).observe(document.documentElement);
 
-app.ticker.add(({ deltaMS }) => {
+const step = (deltaMS: number) => {
   const readings = mode ? robot.update(deltaMS, obstacles) : [];
   for (const reading of readings) slam.addReading(reading);
   sinceReplanMs += deltaMS;
@@ -230,4 +230,7 @@ app.ticker.add(({ deltaMS }) => {
   );
   pathView.update(robot.pose.position, robot.path, goalMarker, goal, deltaMS);
   robotView.update(robot.pose, deltaMS);
-});
+};
+// Pixi also renders on resize, outside the ticker, so place every view before that can happen.
+step(0);
+app.ticker.add(({ deltaMS }) => step(deltaMS));
